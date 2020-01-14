@@ -21,8 +21,12 @@
   <param name="robot_description"
     command="$(find xacro)/xacro --inorder '$(find aleph2_description)/urdf/aleph2.urdf.xacro'" />
 
+  <group ns="aleph2">
+    <rosparam command="load" file="$(find aleph2_gazebo)/config/pid.yaml"/>
+  </group>
+
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-    args="-urdf -model aleph2 -param robot_description"/>
+    args="-urdf -z 1 -model aleph2 -param robot_description"/>
 
 </launch>

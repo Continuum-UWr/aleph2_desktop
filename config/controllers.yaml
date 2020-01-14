@@ -1,0 +1,53 @@
+drivetrain:
+  controllers:
+    velocity:
+      wheel_RL:
+        type: velocity_controllers/JointVelocityController
+        joint: wheel_RL_joint
+      wheel_RR:
+        type: velocity_controllers/JointVelocityController
+        joint: wheel_RR_joint
+      wheel_FL:
+        type: velocity_controllers/JointVelocityController
+        joint: wheel_FL_joint
+      wheel_FR:
+        type: velocity_controllers/JointVelocityController
+        joint: wheel_FR_joint
+    diff_drive:
+      type: "diff_drive_controller/DiffDriveController"
+      left_wheel: ['wheel_RL_joint', 'wheel_FL_joint']
+      right_wheel: ['wheel_RR_joint', 'wheel_FR_joint']
+      publish_rate: 50
+      pose_covariance_diagonal: [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 0.03]
+      twist_covariance_diagonal: [0.001, 0.001, 0.001, 1000000.0, 1000000.0, 0.03]
+      cmd_vel_timeout: 0.25
+      enable_odom_tf: false
+      wheel_separation: 0.9
+      wheel_radius: 0.15
+
+manip:
+  controllers:
+    effort:
+      base:
+        type: effort_controllers/JointEffortController
+        joint: manip_base_joint
+      shoulder:
+        type: effort_controllers/JointEffortController
+        joint: manip_shoulder_joint
+      elbow:
+        type: effort_controllers/JointEffortController
+        joint: manip_elbow_joint
+      wrist_tilt:
+        type: effort_controllers/JointEffortController
+        joint: manip_wrist_tilt_joint
+      wrist_roll:
+        type: effort_controllers/JointEffortController
+        joint: manip_wrist_roll_joint
+      gripper:
+        type: effort_controllers/JointEffortController
+        joint: manip_gripper_joint
+
+controllers:
+  state:
+    type: joint_state_controller/JointStateController
+    publish_rate: 20
