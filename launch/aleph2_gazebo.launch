@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find aleph2_gazebo)/launch/world.launch"/>
+    <include file="$(find aleph2_gazebo)/launch/spawn_model.launch"/>
+    <include file="$(find aleph2_gazebo)/launch/spawn_controllers.launch"/>
+</launch>
