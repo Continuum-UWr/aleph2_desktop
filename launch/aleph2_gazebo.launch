@@ -1,5 +1,12 @@
 <launch>
-    <include file="$(find aleph2_gazebo)/launch/world.launch"/>
+
+    <arg name="gui" default="true" />
+
+    <include file="$(find aleph2_gazebo)/launch/world.launch">
+      <arg name="gui" value="$(arg gui)" />
+    </include>
+
     <include file="$(find aleph2_gazebo)/launch/spawn_model.launch"/>
     <include file="$(find aleph2_gazebo)/launch/spawn_controllers.launch"/>
+
 </launch>
