@@ -1,4 +1,4 @@
-<package>
+<package format="2">
   <name>aleph2_gazebo</name>
   <version>0.0.0</version>
   <description>aleph2_gazebo</description>
@@ -9,10 +9,13 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>gazebo_plugins</run_depend>
-  <run_depend>gazebo_ros</run_depend>
-  <run_depend>gazebo_ros_control</run_depend>
-  <run_depend>xacro</run_depend>
+  <exec_depend>gazebo_plugins</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>gazebo_ros_control</exec_depend>
+  <exec_depend>effort_controllers</exec_depend>
+  <exec_depend>velocity_controllers</exec_depend>
+  <exec_depend>position_controllers</exec_depend>
+  <exec_depend>xacro</exec_depend>
 
   <export>
   </export>
