@@ -1,35 +1,20 @@
 <launch>
 
   <group ns="aleph2">
+  
+    <rosparam command="load" file="$(find aleph2_gazebo)/config/controllers.yaml"/>
 
-    <rosparam file="$(find aleph2_gazebo)/config/controllers.yaml" command="load"/>
-
-    <node name="drivetrain_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args="
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" 
+    respawn="false" output="screen" args="
       drivetrain/controllers/diff_drive
-    "/>
-
-      <!-- drivetrain/controllers/velocity/wheel_FR
-      drivetrain/controllers/velocity/wheel_FL
-      drivetrain/controllers/velocity/wheel_RL
-      drivetrain/controllers/velocity/wheel_RR -->
-
-    <node name="manip_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args="
       manip/controllers/effort/base
       manip/controllers/effort/shoulder
       manip/controllers/effort/elbow
       manip/controllers/effort/wrist_tilt
       manip/controllers/effort/wrist_roll
       manip/controllers/effort/gripper
-    "/>
-
-    <node name="state_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args="
       controllers/state
     "/>
-
-    <remap from="controllers/state/joint_states" to="joint_states"/>
 
   </group>
 
