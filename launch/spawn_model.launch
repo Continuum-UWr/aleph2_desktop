@@ -1,18 +1,20 @@
 <launch>
 
-  <param name="robot_description"
-    command="$(find xacro)/xacro --inorder '$(find aleph2_description)/urdf/aleph2.urdf.xacro'" />
+    <arg name="output" default="log"/>
+    <arg name="model" default="$(find aleph2_description)/urdf/aleph2.urdf.xacro"/>
 
-  <rosparam command="load" ns="aleph2" file="$(find aleph2_gazebo)/config/pid_gains.yaml"/>
+    <param name="robot_description" command="xacro $(arg model)" />
 
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    <rosparam command="load" ns="aleph2" file="$(find aleph2_gazebo)/config/pid_gains.yaml"/>
+
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="$(arg output)"
     args="-urdf 
-      -z 1 
-      -model aleph2 
-      -param robot_description
-      -J manip_shoulder_joint 0.73
-      -J manip_elbow_joint -2.28
-      -J manip_wrist_tilt_joint -1.26
-  "/>
+        -z 1 
+        -model aleph2 
+        -param robot_description
+        -J manip_shoulder_joint 0.73
+        -J manip_elbow_joint -2.28
+        -J manip_wrist_tilt_joint -1.26
+    "/>
 
 </launch>
