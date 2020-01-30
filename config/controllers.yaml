@@ -27,7 +27,7 @@ drivetrain:
 
 manip:
   controllers:
-  
+
     effort:
       base:
         type: effort_controllers/JointEffortController
@@ -78,27 +78,27 @@ manip:
       base:
         type: effort_controllers/JointPositionController
         joint: manip_base_joint
-        pid: { p: 50.0, i: 10.0, d: 0.0 }
+        pid: { p: 1000.0, i: 1000.0, d: 10.0, antiwindup: true, i_clamp: 50.0 }
       shoulder:
         type: effort_controllers/JointPositionController
         joint: manip_shoulder_joint
-        pid: { p: 50.0, i: 10.0, d: 0.0 }
+        pid: { p: 1000.0, i: 1000.0, d: 10.0, antiwindup: true, i_clamp: 50.0 }
       elbow:
         type: effort_controllers/JointPositionController
         joint: manip_elbow_joint
-        pid: { p: 50.0, i: 10.0, d: 0.0 }
+        pid: { p: 1000.0, i: 1000.0, d: 10.0, antiwindup: true, i_clamp: 50.0 }
       wrist_tilt:
         type: effort_controllers/JointPositionController
         joint: manip_wrist_tilt_joint
-        pid: { p: 50.0, i: 10.0, d: 0.0 }
+        pid: { p: 1000.0, i: 1000.0, d: 10.0, antiwindup: true, i_clamp: 50.0 }
       wrist_roll:
         type: effort_controllers/JointPositionController
         joint: manip_wrist_roll_joint
-        pid: { p: 50.0, i: 10.0, d: 0.0 }
+        pid: { p: 1000.0, i: 1000.0, d: 10.0, antiwindup: true, i_clamp: 50.0 }
       gripper:
         type: effort_controllers/JointPositionController
         joint: manip_gripper_joint
-        pid: { p: 50.0, i: 10.0, d: 0.0 }
+        pid: { p: 1000.0, i: 1000.0, d: 10.0, antiwindup: true, i_clamp: 50.0 }
 
     trajectory:
       type: "effort_controllers/JointTrajectoryController"
