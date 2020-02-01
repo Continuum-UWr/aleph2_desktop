@@ -2,8 +2,9 @@
 
     <arg name="output" default="log"/>
     <arg name="model" default="$(find aleph2_description)/urdf/aleph2.urdf.xacro"/>
+    <arg name="fixed" default="false"/>
 
-    <param name="robot_description" command="xacro $(arg model)" />
+    <param name="robot_description" command="xacro $(arg model) fixed:=$(arg fixed)" />
 
     <rosparam command="load" ns="aleph2" file="$(find aleph2_gazebo)/config/pid_gains.yaml"/>
 
