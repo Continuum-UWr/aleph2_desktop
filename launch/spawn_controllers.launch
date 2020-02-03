@@ -1,5 +1,5 @@
 <launch>
-    <arg name="output" default="log"/>
+    <arg name="output" default="screen"/>
 
     <group ns="aleph2">
     
@@ -18,6 +18,10 @@
 
         <node name="controller_spawner_stopped" pkg="controller_manager" type="spawner" output="$(arg output)" args="
             --stopped
+            drivetrain/controllers/velocity/wheelRL
+            drivetrain/controllers/velocity/wheelRR
+            drivetrain/controllers/velocity/wheelFL
+            drivetrain/controllers/velocity/wheelFR
             manip/controllers/velocity/base
             manip/controllers/velocity/shoulder
             manip/controllers/velocity/elbow

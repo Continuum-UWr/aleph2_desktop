@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="output" default="log"/>
+    <arg name="output" default="screen"/>
     <arg name="model" default="$(find aleph2_description)/urdf/aleph2.urdf.xacro"/>
     <arg name="fixed" default="false"/>
 
