@@ -18,10 +18,10 @@
 
         <node name="controller_spawner_stopped" pkg="controller_manager" type="spawner" output="$(arg output)" args="
             --stopped
-            drivetrain/controllers/velocity/wheelRL
-            drivetrain/controllers/velocity/wheelRR
-            drivetrain/controllers/velocity/wheelFL
-            drivetrain/controllers/velocity/wheelFR
+            drivetrain/controllers/velocity/wheel_RL
+            drivetrain/controllers/velocity/wheel_RR
+            drivetrain/controllers/velocity/wheel_FL
+            drivetrain/controllers/velocity/wheel_FR
             manip/controllers/velocity/base
             manip/controllers/velocity/shoulder
             manip/controllers/velocity/elbow
