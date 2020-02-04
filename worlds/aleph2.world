@@ -2,6 +2,16 @@
 <sdf version="1.4">
 
   <world name="default">
+
+    <scene>
+      <sky>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <shadows>true</shadows>
+    </scene>
+
     <include>
       <uri>model://ground_plane</uri>
     </include>
