@@ -40,6 +40,7 @@
     </group>
 
     <node name="aleph2_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="$(arg output)">
+        <remap from="robot_description" to="aleph2/robot_description"/>
         <remap from="joint_states" to="aleph2/joint_states"/>
     </node>
 
