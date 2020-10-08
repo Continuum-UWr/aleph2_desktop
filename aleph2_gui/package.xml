@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>aleph2_gui</name>
+  <version>1.0.0</version>
+  <description>
+    Rover's control software
+  </description>
+
+  <maintainer email="blazej@todo.todo">blazej</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>python-rospkg</exec_depend>
+  <exec_depend>rosgraph</exec_depend>
+  <exec_depend>rqt_gui_py</exec_depend>
+  <exec_depend>dynamic_reconfigure</exec_depend>
+
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+
+  <exec_depend>input_msgs</exec_depend>
+
+  <export>
+    <rqt_gui plugin="${prefix}/rqt_plugins.xml"/>
+  </export>
+  
+</package>

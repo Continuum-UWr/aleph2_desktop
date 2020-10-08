@@ -1,0 +1,18 @@
+<library path="src">
+  <class name="Aleph2DrivetrainController" type="aleph2_drivetrain_controller.Aleph2DrivetrainController" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      Drivetrain control program
+    </description>
+    <qtgui>
+      <group>
+        <label>Continuum</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins brought to you with love by Continuum.</statustip>
+      </group>
+
+      <label>Aleph2 Drivetrain Controller</label>
+      <!-- <icon type="theme">system-help</icon> -->
+      <statustip>halotrony</statustip>
+    </qtgui>
+  </class>
+</library>
