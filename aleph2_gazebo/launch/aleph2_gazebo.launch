@@ -1,0 +1,21 @@
+<launch>
+
+    <arg name="output" default="log"/>
+    <arg name="world" default="$(find aleph2_gazebo)/worlds/aleph2.world"/>
+    <arg name="gui" default="true" />
+
+    <include file="$(find aleph2_gazebo)/launch/world.launch">
+        <arg name="output" value="$(arg output)"/>
+        <arg name="world" value="$(arg world)"/>
+        <arg name="gui" value="$(arg gui)" />
+    </include>
+
+    <include file="$(find aleph2_gazebo)/launch/spawn_model.launch">
+        <arg name="output" value="$(arg output)"/>
+    </include>
+    
+    <include file="$(find aleph2_gazebo)/launch/spawn_controllers.launch">
+        <arg name="output" value="$(arg output)"/>
+    </include>
+
+</launch>
