@@ -1,5 +1,5 @@
 <library path="src">
-  <class name="Aleph2DrivetrainController" type="aleph2_drivetrain_controller.Aleph2DrivetrainController" base_class_type="rqt_gui_py::Plugin">
+  <class name="Aleph2DrivetrainController" type="aleph2_gui.aleph2_drivetrain_controller.Aleph2DrivetrainController" base_class_type="rqt_gui_py::Plugin">
     <description>
       Drivetrain control program
     </description>

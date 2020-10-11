@@ -6,8 +6,8 @@ from catkin_pkg.python_setup import generate_distutils_setup
 # fetch values from package.xml
 setup_args = generate_distutils_setup(
     packages=[
-        'aleph2_drivetrain_controller',
-        'joystick_selector'
+        'aleph2_gui.aleph2_drivetrain_controller',
+        'aleph2_gui.joystick_selector',
     ],
     package_dir={'': 'src'}
 )

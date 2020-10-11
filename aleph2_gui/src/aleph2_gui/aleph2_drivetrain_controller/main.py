@@ -22,8 +22,8 @@ from resources_rc import *
 from std_msgs.msg import Bool, Float32
 from nav_msgs.msg import Odometry
 
-from joystick_selector import JoystickSelector
-from steering_module import SteeringModule
+from aleph2_gui.joystick_selector import JoystickSelector
+from .steering_module import SteeringModule
 
 
 class Aleph2DrivetrainController(Plugin):
