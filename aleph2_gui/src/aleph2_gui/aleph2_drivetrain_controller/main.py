@@ -10,18 +10,12 @@ import dynamic_reconfigure.client
 from rqt_gui_py.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
-
-from PyQt5.QtCore import pyqtSlot, pyqtSignal
-from PyQt5.QtGui import *
-
-# add resources folder to python load path
-sys.path.append(os.path.join(rospkg.RosPack().get_path("aleph2_gui"), "resources"))
-
-from resources_rc import *
+from python_qt_binding.QtCore import pyqtSlot, pyqtSignal
 
 from std_msgs.msg import Bool, Float32
 from nav_msgs.msg import Odometry
 
+import aleph2_gui.resources.ta
 from aleph2_gui.joystick_selector import JoystickSelector
 from .steering_module import SteeringModule
 

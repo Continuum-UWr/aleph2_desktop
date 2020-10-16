@@ -8,6 +8,7 @@ setup_args = generate_distutils_setup(
     packages=[
         'aleph2_gui.aleph2_drivetrain_controller',
         'aleph2_gui.joystick_selector',
+        'aleph2_gui.resources',
     ],
     package_dir={'': 'src'}
 )
