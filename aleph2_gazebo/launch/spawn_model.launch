@@ -1,22 +1,42 @@
 <launch>
 
-    <arg name="output" default="screen"/>
-    <arg name="model" default="$(find aleph2_description)/urdf/aleph2.urdf.xacro"/>
-    <arg name="fixed" default="false"/>
+  <arg name="x" default="0.0"/>
+  <arg name="y" default="0.0"/>
+  <arg name="z" default="1.0"/>
+  <arg name="R" default="0.0"/>
+  <arg name="P" default="0.0"/>
+  <arg name="Y" default="0.0"/>
 
-    <group ns="aleph2">
-        <param name="robot_description" command="xacro $(arg model) fixed:=$(arg fixed)" />
-        <rosparam command="load" file="$(find aleph2_gazebo)/config/pid_gains.yaml"/>
-    </group>
+  <arg name="model" default="$(find aleph2_description)/urdf/aleph2.urdf.xacro"/>
+  
+  <arg name="fixed" default="false"/>
+  <arg name="robot_ns" default="aleph2"/>
+  <arg name="model_name" default="aleph2"/>
 
-    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="$(arg output)"
-    args="-urdf 
-        -z 1 
-        -model aleph2 
-        -param aleph2/robot_description
-        -J manip_shoulder_joint 0.73
-        -J manip_elbow_joint -2.28
-        -J manip_wrist_tilt_joint -1.26
+  <group ns="$(arg robot_ns)">
+
+    <param name="robot_description" command="xacro $(arg model) 
+      fixed:=$(arg fixed)
+      robot_ns:=$(arg robot_ns)
+      rockers_fixed:=false
     "/>
+
+    <rosparam command="load" file="$(find aleph2_gazebo)/config/pid_gains.yaml"/>
+
+    <node name="urdf_spawner"
+          pkg="gazebo_ros"
+          type="spawn_model"
+          respawn="false"
+          args="-urdf 
+      -x $(arg x) -y $(arg y) -z $(arg z)
+      -R $(arg R) -P $(arg P) -Y $(arg Y)
+      -model $(arg model_name) 
+      -param robot_description
+      -J manip_shoulder_joint 0.73
+      -J manip_elbow_joint 2.28
+      -J manip_wrist_tilt_joint -1.26 
+    "/>
+
+  </group>
 
 </launch>

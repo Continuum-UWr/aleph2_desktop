@@ -1,47 +1,55 @@
 <launch>
-    <arg name="output" default="screen"/>
 
-    <group ns="aleph2">
+  <arg name="robot_ns" default="aleph2"/>
+
+  <group ns="$(arg robot_ns)">
+    <rosparam command="load" file="$(find aleph2_gazebo)/config/controllers.yaml"/>
     
-        <rosparam command="load" file="$(find aleph2_gazebo)/config/controllers.yaml"/>
+    <node name="controller_spawner" 
+          pkg="controller_manager"
+          type="spawner" args="
+      controllers/state
+      drivetrain/controllers/diff_drive
+      manip/controllers/effort/base
+      manip/controllers/effort/shoulder
+      manip/controllers/effort/elbow
+      manip/controllers/effort/wrist_tilt
+      manip/controllers/effort/wrist_roll
+      manip/controllers/effort/gripper
+    "/>
 
-        <node name="controller_spawner" pkg="controller_manager" type="spawner" output="$(arg output)" args="
-            controllers/state
-            drivetrain/controllers/diff_drive
-            manip/controllers/effort/base
-            manip/controllers/effort/shoulder
-            manip/controllers/effort/elbow
-            manip/controllers/effort/wrist_tilt
-            manip/controllers/effort/wrist_roll
-            manip/controllers/effort/gripper
-        "/>
+    <node name="controller_spawner_stopped" 
+          pkg="controller_manager"
+          type="spawner" args="
+      --stopped
+      drivetrain/controllers/velocity/wheel_RL
+      drivetrain/controllers/velocity/wheel_RR
+      drivetrain/controllers/velocity/wheel_FL
+      drivetrain/controllers/velocity/wheel_FR
+      manip/controllers/velocity/base
+      manip/controllers/velocity/shoulder
+      manip/controllers/velocity/elbow
+      manip/controllers/velocity/wrist_tilt
+      manip/controllers/velocity/wrist_roll
+      manip/controllers/velocity/gripper
+      manip/controllers/position/base
+      manip/controllers/position/shoulder
+      manip/controllers/position/elbow
+      manip/controllers/position/wrist_tilt
+      manip/controllers/position/wrist_roll
+      manip/controllers/position/gripper
+      manip/controllers/trajectory
+    "/>
 
-        <node name="controller_spawner_stopped" pkg="controller_manager" type="spawner" output="$(arg output)" args="
-            --stopped
-            drivetrain/controllers/velocity/wheel_RL
-            drivetrain/controllers/velocity/wheel_RR
-            drivetrain/controllers/velocity/wheel_FL
-            drivetrain/controllers/velocity/wheel_FR
-            manip/controllers/velocity/base
-            manip/controllers/velocity/shoulder
-            manip/controllers/velocity/elbow
-            manip/controllers/velocity/wrist_tilt
-            manip/controllers/velocity/wrist_roll
-            manip/controllers/velocity/gripper
-            manip/controllers/position/base
-            manip/controllers/position/shoulder
-            manip/controllers/position/elbow
-            manip/controllers/position/wrist_tilt
-            manip/controllers/position/wrist_roll
-            manip/controllers/position/gripper
-            manip/controllers/trajectory
-        "/>
+    <node name="robot_state_publisher"
+          pkg="robot_state_publisher"
+          type="robot_state_publisher"/>
 
-    </group>
+    <node name="cmd_vel_relay"
+          pkg="topic_tools"
+          type="relay"
+          args="cmd_vel drivetrain/controllers/diff_drive/cmd_vel"/>
 
-    <node name="aleph2_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="$(arg output)">
-        <remap from="robot_description" to="aleph2/robot_description"/>
-        <remap from="joint_states" to="aleph2/joint_states"/>
-    </node>
+  </group>
 
 </launch>

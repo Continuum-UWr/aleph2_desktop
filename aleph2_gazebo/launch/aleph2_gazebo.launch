@@ -1,21 +1,27 @@
 <launch>
 
-    <arg name="output" default="log"/>
-    <arg name="world" default="$(find aleph2_gazebo)/worlds/aleph2.world"/>
-    <arg name="gui" default="true" />
+  <arg name="fixed" default="false"/>
+  <arg name="robot_ns" default="aleph2"/>
+  <arg name="model_name" default="aleph2"/>
 
-    <include file="$(find aleph2_gazebo)/launch/world.launch">
-        <arg name="output" value="$(arg output)"/>
-        <arg name="world" value="$(arg world)"/>
-        <arg name="gui" value="$(arg gui)" />
-    </include>
+  <arg name="world_name" default="worlds/empty.world"/>
+  <arg name="paused" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="debug" default="false"/>
+  <arg name="verbose" default="false"/>
 
-    <include file="$(find aleph2_gazebo)/launch/spawn_model.launch">
-        <arg name="output" value="$(arg output)"/>
-    </include>
-    
-    <include file="$(find aleph2_gazebo)/launch/spawn_controllers.launch">
-        <arg name="output" value="$(arg output)"/>
-    </include>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="debug" value="$(arg debug)"/>
+    <arg name="verbose" value="$(arg verbose)"/>
+  </include>
+
+  <include file="$(find aleph2_gazebo)/launch/spawn_robot.launch">
+    <arg name="fixed" value="$(arg fixed)"/>
+    <arg name="robot_ns" value="$(arg robot_ns)"/>
+    <arg name="model_name" value="$(arg model_name)"/>
+  </include>
 
 </launch>
