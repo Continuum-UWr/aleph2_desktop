@@ -18,7 +18,8 @@
     <arg name="verbose" value="$(arg verbose)"/>
   </include>
 
-  <include file="$(find aleph2_gazebo)/launch/spawn_robot.launch">
+  <include file="$(find aleph2_gazebo)/launch/spawn_robot.launch"
+           pass_all_args="true">
     <arg name="fixed" value="$(arg fixed)"/>
     <arg name="robot_ns" value="$(arg robot_ns)"/>
     <arg name="model_name" value="$(arg model_name)"/>
