@@ -27,3 +27,4 @@ class SteeringModule:
 
     def shutdown(self):
         self.pub_cmd.unregister()
+        self.pub_mux.unregister()
