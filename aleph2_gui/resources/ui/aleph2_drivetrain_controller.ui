@@ -303,7 +303,7 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
                <string>ACTIVE</string>
               </property>
               <property name="checked">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
              </widget>
             </item>

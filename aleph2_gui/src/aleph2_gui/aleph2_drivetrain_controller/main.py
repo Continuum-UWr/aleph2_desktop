@@ -40,12 +40,8 @@ class Aleph2DrivetrainController(Plugin):
 
     @pyqtSlot(int)
     def ISensChanged(self, value):
-        self.sensitivity = 1
+        self.sensitivity = 1.33 ** value
         self.sensitivity_level = value
-        for _ in range(value, 0):
-            self.sensitivity /= 1.33
-        for _ in range(0, value):
-            self.sensitivity *= 1.33
 
     @pyqtSlot(bool)
     def CBACTIVEToggled(self, checked):
@@ -175,8 +171,10 @@ class Aleph2DrivetrainController(Plugin):
         self.btn_pwr_off = 1
         self.btn_brk_on = 4
         self.btn_brk_off = 2
+        self.btn_temp_active = 5
 
-        self.input_active = True
+        self.input_active = False
+        self.input_temp_active = False
         self.mux_mode = False
         self.ignore_planner = False
         self.reconfigure_broken = False
@@ -286,13 +284,17 @@ class Aleph2DrivetrainController(Plugin):
 
             if i == self.btn_brk_on:
                 self.brake = [True] * 4
+
             if i == self.btn_brk_off:
                 self.brake = [False] * 4
+        
+        self.input_temp_active = data.buttons[self.btn_temp_active]
                 
         if len(data.buttons_pressed) > 0:
             self.refresh_signal.emit()
 
-        if self.input_active:
+        #two modes when steering works - first by button in ui and second by simulteniously holding key on joypad
+        if self.input_active or self.input_temp_active: 
             axes = []
             for axis in data.axes:
                 axes.append(axis * self.sensitivity)
