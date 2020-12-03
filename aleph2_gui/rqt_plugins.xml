@@ -15,4 +15,37 @@
       <statustip>halotrony</statustip>
     </qtgui>
   </class>
+  <class name="Aleph2ManipController" type="aleph2_gui.aleph2_manip_controller.Aleph2ManipController" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      Manip control program
+    </description>
+    <qtgui>
+      <group>
+        <label>Continuum</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins brought to you with love by Continuum.</statustip>
+      </group>
+
+      <label>Aleph2 Manip Controller</label>
+      <!-- <icon type="theme">system-help</icon> -->
+      <statustip>halotrony</statustip>
+    </qtgui>
+  </class>
+  <class name="RubiController" type="aleph2_gui.rubi_controller.RubiController" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      Rubi control program
+    </description>
+    <qtgui>
+      <group>
+        <label>Continuum</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins brought to you with love by Continuum.</statustip>
+      </group>
+
+      <label>Rubi Controller</label>
+      <icon type="theme">application-x-ruby</icon>
+      <statustip>halotrony</statustip>
+    </qtgui>
+  </class>
+
 </library>
