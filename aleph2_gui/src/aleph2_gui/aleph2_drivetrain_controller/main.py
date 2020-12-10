@@ -23,8 +23,120 @@ from .steering_module import SteeringModule
 class Aleph2DrivetrainController(Plugin):
     refresh_signal = pyqtSignal()
     odom_refresh_signal = pyqtSignal()
-    
-    DRIVER_TIMEOUT = 1.0 # sec
+
+    DRIVER_TIMEOUT = 1.0  # sec
+
+    BTN_SENS_UP = 7
+    BTN_SENS_DOWN = 6
+    BTN_PWR_ON = 0
+    BTN_PWR_OFF = 1
+    BTN_BRK_ON = 4
+    BTN_BRK_OFF = 2
+    BTN_TEMP_ACTIVE = 5
+
+    def __init__(self, context):
+        super(Aleph2DrivetrainController, self).__init__(context)
+
+        self.setObjectName('DrivetrainController')
+
+        self._widget = QWidget()
+
+        ui_file = os.path.join(
+            rospkg.RosPack().get_path("aleph2_gui"),
+            "resources/ui/aleph2_drivetrain_controller.ui"
+        )
+
+        loadUi(ui_file, self._widget)
+        self._widget.setObjectName('DrivetrainUi')
+
+        if context.serial_number() > 1:
+            self._widget.setWindowTitle(
+                self._widget.windowTitle() + (' (%d)' % context.serial_number()))
+
+        context.add_widget(self._widget)
+
+        self.odometry = Odometry()
+
+        self.power = [False] * 4
+        self.brake = [False] * 4
+
+        self.sensitivity = 1
+        self.sensitivity_level = 0
+
+        self.input_active = False
+        self.input_temp_active = False
+        self.mux_mode = False
+        self.ignore_planner = False
+        self.reconfigure_broken = False
+
+        self.usage_label = "USAGE:"
+
+        self.last_update = time.time()
+        self.driver_online = threading.Event()
+
+        self.pub_ign_planner = rospy.Publisher(
+            "ign_planner",
+            Bool,
+            queue_size=1
+        )
+
+        try:
+            self.FLConfigClient = dynamic_reconfigure.client.Client(
+                "aleph2/drivetrain/joints/wheel_FL_joint",
+                timeout=1,
+                config_callback=self.get_config_callback(0)
+            )
+
+            self.BLConfigClient = dynamic_reconfigure.client.Client(
+                "aleph2/drivetrain/joints/wheel_RL_joint",
+                timeout=1,
+                config_callback=self.get_config_callback(1)
+            )
+
+            self.FRConfigClient = dynamic_reconfigure.client.Client(
+                "aleph2/drivetrain/joints/wheel_FR_joint",
+                timeout=1,
+                config_callback=self.get_config_callback(2)
+            )
+
+            self.BRConfigClient = dynamic_reconfigure.client.Client(
+                "aleph2/drivetrain/joints/wheel_RR_joint",
+                timeout=1,
+                config_callback=self.get_config_callback(3)
+            )
+        except rospy.ROSException:
+            rospy.logerr(
+                "Could not initialize dynamic reconfigure clients for wheel joints")
+            self.reconfigure_broken = True
+
+        self.setup_signals()
+
+        self.sub_odom = rospy.Subscriber(
+            "aleph2/drivetrain/controllers/diff_drive/odom",
+            Odometry,
+            self.odom_callback
+        )
+
+        self.sub_usage = rospy.Subscriber(
+            "aleph2/drivetrain_control_loop/usage",
+            Float32,
+            self.usage_callback
+        )
+
+        self.selector = JoystickSelector(self.input_callback)
+        self.steerer = SteeringModule()
+
+        self.refresh_signal.emit()
+
+        self.check_driver_thread = threading.Thread(
+            target=self.check_driver_loop)
+        self.check_driver_thread.daemon = True
+        self.check_driver_thread.start()
+
+        self.ignore_planner_thread = threading.Thread(
+            target=self.ignore_planner_loop)
+        self.ignore_planner_thread.daemon = True
+        self.ignore_planner_thread.start()
 
     def DriverPanel(self, name):
         return self._widget.PDRIVER.findChild(QWidget, name)
@@ -61,13 +173,16 @@ class Aleph2DrivetrainController(Plugin):
 
     @pyqtSlot()
     def slot_refresh_odom(self):
-       self.OdomPanel("PBF").setValue(abs(self.odometry.twist.twist.linear.x * 15))
-       if self.odometry.twist.twist.angular.z > 0:
-           self.OdomPanel("PBDR").setValue(self.odometry.twist.twist.angular.z * 20)
-           self.OdomPanel("PBDL").setValue(0)
-       else:
-           self.OdomPanel("PBDR").setValue(0)
-           self.OdomPanel("PBDL").setValue(-self.odometry.twist.twist.angular.z * 20)
+        self.OdomPanel("PBF").setValue(
+            abs(self.odometry.twist.twist.linear.x * 15))
+        if self.odometry.twist.twist.angular.z > 0:
+            self.OdomPanel("PBDR").setValue(
+                self.odometry.twist.twist.angular.z * 20)
+            self.OdomPanel("PBDL").setValue(0)
+        else:
+            self.OdomPanel("PBDR").setValue(0)
+            self.OdomPanel(
+                "PBDL").setValue(-self.odometry.twist.twist.angular.z * 20)
 
     @pyqtSlot()
     def slot_refresh_gui(self):
@@ -130,120 +245,12 @@ class Aleph2DrivetrainController(Plugin):
             "brake": self.brake[3]
         })
 
-    def GetConfigCallback(self, wheel):
+    def get_config_callback(self, wheel):
         def ConfigCallback(config):
             self.power[wheel] = config.power
             self.brake[wheel] = config.brake
             self.refresh_signal.emit()
         return ConfigCallback
-
-    def __init__(self, context):
-        super(Aleph2DrivetrainController, self).__init__(context)
-
-        self.setObjectName('DrivetrainController')
-
-        self._widget = QWidget()
-
-        ui_file = os.path.join(
-            rospkg.RosPack().get_path("aleph2_gui"), 
-            "resources/ui/aleph2_drivetrain_controller.ui"
-        )
-
-        loadUi(ui_file, self._widget)
-        self._widget.setObjectName('DrivetrainUi')
-
-        if context.serial_number() > 1:
-            self._widget.setWindowTitle(
-                self._widget.windowTitle() + (' (%d)' % context.serial_number()))
-
-        context.add_widget(self._widget)
-
-        self.odometry = Odometry()
-
-        self.power = [False] * 4
-        self.brake = [False] * 4
-
-        self.sensitivity = 1
-        self.sensitivity_level = 0
-        self.btn_sens_up = 7
-        self.btn_sens_down = 6
-        self.btn_pwr_on = 0
-        self.btn_pwr_off = 1
-        self.btn_brk_on = 4
-        self.btn_brk_off = 2
-        self.btn_temp_active = 5
-
-        self.input_active = False
-        self.input_temp_active = False
-        self.mux_mode = False
-        self.ignore_planner = False
-        self.reconfigure_broken = False
-
-        self.usage_label = "USAGE:"
-
-        self.last_update = time.time()
-        self.driver_online = threading.Event()
-
-        self.pub_ign_planner = rospy.Publisher(
-            "ign_planner",
-            Bool,
-            queue_size=1
-        )
-
-        try:
-            self.FLConfigClient = dynamic_reconfigure.client.Client(
-                "aleph2/drivetrain/joints/wheel_FL_joint", 
-                timeout=1, 
-                config_callback=self.GetConfigCallback(0)
-            )
-
-            self.BLConfigClient = dynamic_reconfigure.client.Client(
-                "aleph2/drivetrain/joints/wheel_RL_joint", 
-                timeout=1, 
-                config_callback=self.GetConfigCallback(1)
-            )
-
-            self.FRConfigClient = dynamic_reconfigure.client.Client(
-                "aleph2/drivetrain/joints/wheel_FR_joint", 
-                timeout=1, 
-                config_callback=self.GetConfigCallback(2)
-            )
-
-            self.BRConfigClient = dynamic_reconfigure.client.Client(
-                "aleph2/drivetrain/joints/wheel_RR_joint", 
-                timeout=1, 
-                config_callback=self.GetConfigCallback(3)
-            )
-        except rospy.ROSException:
-            rospy.logerr("Could not initialize dynamic reconfigure clients for wheel joints")
-            self.reconfigure_broken = True
-
-        self.setup_signals()
-
-        self.sub_odom = rospy.Subscriber(
-            "aleph2/drivetrain/controllers/diff_drive/odom",
-            Odometry,  
-            self.odom_callback
-        )
-
-        self.sub_usage = rospy.Subscriber(
-            "aleph2/drivetrain_control_loop/usage",
-            Float32,
-            self.usage_callback
-        )
-
-        self.selector = JoystickSelector(self.input_callback)
-        self.steerer = SteeringModule()
-
-        self.refresh_signal.emit()
-        
-        self.check_driver_thread = threading.Thread(target=self.check_driver_loop)
-        self.check_driver_thread.daemon = True
-        self.check_driver_thread.start()
-
-        self.ignore_planner_thread = threading.Thread(target=self.ignore_planner_loop)
-        self.ignore_planner_thread.daemon = True
-        self.ignore_planner_thread.start()
 
     @pyqtSlot()
     def BTNControllerClicked(self):
@@ -253,7 +260,8 @@ class Aleph2DrivetrainController(Plugin):
         self.refresh_signal.connect(self.slot_refresh_gui)
         self.odom_refresh_signal.connect(self.slot_refresh_odom)
 
-        self.InputPanel("BTNController").clicked.connect(self.BTNControllerClicked)
+        self.InputPanel("BTNController").clicked.connect(
+            self.BTNControllerClicked)
         self.InputPanel("ISENSITIVITY").valueChanged.connect(self.ISensChanged)
         self.InputPanel("CBACTIVE").toggled.connect(self.CBACTIVEToggled)
         self.InputPanel("CBMUX").toggled.connect(self.CBMUXToggled)
@@ -272,29 +280,29 @@ class Aleph2DrivetrainController(Plugin):
     def input_callback(self, data):
 
         for i in data.buttons_pressed:
-            if i == self.btn_sens_up and self.sensitivity_level < 5:
+            if i == self.BTN_SENS_UP and self.sensitivity_level < 5:
                 self.sensitivity_level += 1
-            if i == self.btn_sens_down and self.sensitivity_level > -5:
+            if i == self.BTN_SENS_DOWN and self.sensitivity_level > -5:
                 self.sensitivity_level -= 1
 
-            if i == self.btn_pwr_on:
+            if i == self.BTN_PWR_ON:
                 self.power = [True] * 4
-            if i == self.btn_pwr_off:
+            if i == self.BTN_PWR_OFF:
                 self.power = [False] * 4
 
-            if i == self.btn_brk_on:
+            if i == self.BTN_BRK_ON:
                 self.brake = [True] * 4
 
-            if i == self.btn_brk_off:
+            if i == self.BTN_BRK_OFF:
                 self.brake = [False] * 4
-        
-        self.input_temp_active = data.buttons[self.btn_temp_active]
-                
+
+        self.input_temp_active = data.buttons[self.BTN_TEMP_ACTIVE]
+
         if len(data.buttons_pressed) > 0:
             self.refresh_signal.emit()
 
-        #two modes when steering works - first by button in ui and second by simulteniously holding key on joypad
-        if self.input_active or self.input_temp_active: 
+        # two modes when steering works - first by button in ui and second by simulteniously holding key on joypad
+        if self.input_active or self.input_temp_active:
             axes = []
             for axis in data.axes:
                 axes.append(axis * self.sensitivity)
@@ -315,7 +323,8 @@ class Aleph2DrivetrainController(Plugin):
             self.driver_online.wait()
 
             while time.time() < self.last_update + self.DRIVER_TIMEOUT:
-                time.sleep(self.last_update - time.time() + self.DRIVER_TIMEOUT)
+                time.sleep(self.last_update -
+                           time.time() + self.DRIVER_TIMEOUT)
 
             self.driver_online.clear()
             self.refresh_signal.emit()

@@ -19,10 +19,9 @@ from std_msgs.msg import Float64
 
 
 class Aleph2ManipController(Plugin):
-    effector_panel_k = float(1)/200
-    sensitivity_step = 1.5
-    btn_sens_up = 7
-    btn_sens_down = 6
+    SENSITIVITY_STEP = 1.5
+    BTN_SENS_UP = 7
+    BTN_SENS_DOWN = 6
 
     def InputPanel(self, name):
         return self._widget.PIN.findChild(QWidget, name)
@@ -32,9 +31,9 @@ class Aleph2ManipController(Plugin):
         self.setObjectName('Aleph2ManipController')
 
         self._widget = QWidget()
-        
+
         ui_file = os.path.join(
-            rospkg.RosPack().get_path("aleph2_gui"), 
+            rospkg.RosPack().get_path("aleph2_gui"),
             "resources/ui/aleph2_manip_controller.ui"
         )
 
@@ -46,12 +45,11 @@ class Aleph2ManipController(Plugin):
                 self._widget.windowTitle(), context.serial_number()))
         context.add_widget(self._widget)
 
-
         self.sensitivity = 0
         self.sensitivity_value = 1
         self.SensitivityChanged()
 
-        self.effortController=EffortController()
+        self.effortController = EffortController()
 
         self.selector = JoystickSelector(self.input_callback)
 
@@ -64,13 +62,12 @@ class Aleph2ManipController(Plugin):
     @pyqtSlot()
     def SensitivityChanged(self):
         self.sensitivity = self.InputPanel("SBSENS").value()
-        self.sensitivity_value = math.pow(self.sensitivity_step,self.sensitivity)
-
+        self.sensitivity_value = math.pow(
+            self.SENSITIVITY_STEP, self.sensitivity)
 
     @pyqtSlot()
     def BTNControllerClicked(self):
         self.InputPanel("BTNController").setText(self.selector.Switch())
-
 
     def input_callback(self, data):  # noqa
         axes = []
@@ -78,15 +75,14 @@ class Aleph2ManipController(Plugin):
             axes.append(axis * self.sensitivity_value)
 
         for i in data.buttons_pressed:
-            if i == self.btn_sens_up and self.sensitivity < 7:
+            if i == self.BTN_SENS_UP and self.sensitivity < 7:
                 self.sensitivity += 1
                 self.InputPanel("SBSENS").setValue(self.sensitivity)
-            if i == self.btn_sens_down and self.sensitivity > -1:
+            if i == self.BTN_SENS_DOWN and self.sensitivity > -1:
                 self.sensitivity -= 1
                 self.InputPanel("SBSENS").setValue(self.sensitivity)
-        
-        self.effortController.input_callback(data, self.sensitivity_value)
 
+        self.effortController.input_callback(data, self.sensitivity_value)
 
     def shutdown_plugin(self):
         pass
@@ -101,42 +97,46 @@ class Aleph2ManipController(Plugin):
         # v = instance_settings.value(k)
         pass
 
+
 class EffortController:
     JOINT_NAMES = [
-            "base",
-            "elbow",
-            "gripper",
-            "shoulder",
-            "wrist_roll",
-            "wrist_tilt",
-            ]
+        "base",
+        "elbow",
+        "gripper",
+        "shoulder",
+        "wrist_roll",
+        "wrist_tilt",
+    ]
     JOINT_AXES = {
-            "base":[0],
-            "elbow":[1],
-            "shoulder":[2,5],
-            "wrist_roll":[3],
-            "wrist_tilt":[4],
-            }
+        "base": [0],
+        "elbow": [1],
+        "shoulder": [2, 5],
+        "wrist_roll": [3],
+        "wrist_tilt": [4],
+    }
     JOINT_KEYS = {
-            "gripper":([0],[1])
-            }
-    BASE_MULTPLIER=50.0
-    MULTPLIER={
-            "base":1.0,
-            "elbow":1.0,
-            "gripper":1.0,
-            "shoulder":1.0,
-            "wrist_roll":1.0,
-            "wrist_tilt":1.0,
-            }
+        "gripper": ([0], [1])
+    }
+    BASE_MULTPLIER = 50.0
+    MULTPLIER = {
+        "base": 1.0,
+        "elbow": 1.0,
+        "gripper": 1.0,
+        "shoulder": 1.0,
+        "wrist_roll": 1.0,
+        "wrist_tilt": 1.0,
+    }
+
     def __init__(self):
-        self.pubs={}
+        self.pubs = {}
         for name in self.JOINT_NAMES:
-            self.pubs[name]=rospy.Publisher("/aleph2/manip/controllers/effort/{}/command".format(name),Float64,queue_size=1)
+            self.pubs[name] = rospy.Publisher(
+                "/aleph2/manip/controllers/effort/{}/command".format(name), Float64, queue_size=1)
+
     def input_callback(self, data, sens_mult):
-        axes=list(data.axes)
-        axes[2]=(axes[2]+1)/2
-        axes[5]=-(axes[5]+1)/2
+        axes = list(data.axes)
+        axes[2] = (axes[2]+1)/2
+        axes[5] = -(axes[5]+1)/2
 
         for axisName in self.JOINT_AXES:
             mult = sens_mult*self.BASE_MULTPLIER*self.MULTPLIER[axisName]
@@ -148,7 +148,7 @@ class EffortController:
         for axisName in self.JOINT_KEYS:
             mult = sens_mult*self.BASE_MULTPLIER*self.MULTPLIER[axisName]
             value = 1*sum([data.buttons[i] for i in self.JOINT_KEYS[axisName][0]]) + \
-                    -1*sum([data.buttons[i] for i in self.JOINT_KEYS[axisName][1]])
+                -1*sum([data.buttons[i] for i in self.JOINT_KEYS[axisName][1]])
 
             value = mult * value
             print(value)
