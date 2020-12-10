@@ -1,0 +1,1 @@
+from .main import Aleph2PowerController
