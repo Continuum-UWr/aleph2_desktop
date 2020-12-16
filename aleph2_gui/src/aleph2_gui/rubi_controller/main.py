@@ -1,5 +1,20 @@
+# todos
+# when board removed -- clear_gui + refresh_boards
+# better new window showing
+# rubi_board.py?
+# BoardAnnounce -- but problem with start (distrituted approach)
+# maybe only one RC (return from _widget2)?
+# 17 boards -> scroll disapears, tf?;
+# all magic values to other file
+# include rubi_autodefs? regex
+# RubiController scrollarea resize right
+# todo publishers at end?
+# chb -> is_online, cb2 -> is_wake
+# connect buttions when rubi_controller out
 import os
 import sys
+import copy
+
 from math import ceil
 from functools import partial
 from collections import OrderedDict
@@ -9,18 +24,16 @@ import rospkg
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QCheckBox, QLabel, \
-    QPushButton, QSpinBox, QDoubleSpinBox, QTextEdit
-from python_qt_binding.QtCore import pyqtSlot, pyqtSignal, QEvent, QMetaObject
-from python_qt_binding.QtGui import QPixmap
+from python_qt_binding.QtWidgets import QWidget
+from python_qt_binding.QtCore import pyqtSlot, pyqtSignal
 
 from std_msgs.msg import Empty, Float32MultiArray
-from rubi_server.msg import RubiInt, RubiFloat, RubiString, RubiBool
-from rubi_server.srv import BoardOnline, BoardWake
-from rubi_server.srv import ShowBoards, BoardDescriptor, \
-    BoardInstances, FieldDescriptor, FuncDescriptor, CansNames
+from rubi_server.msg import RubiInt, RubiUnsignedInt, RubiFloat, RubiString, RubiBool
+from rubi_server.srv import (ShowBoards, BoardDescriptor, BoardInstances,
+                             FieldDescriptor, FuncDescriptor, CansNames, BoardOnline, BoardWake)
 
 import aleph2_gui.resources.ta
+from .rubi_interface_builder import RubiInterfaceBuilder
 from .rubi_board import QTextEditEventFilter, QSpinBoxEventFilter
 
 
@@ -35,11 +48,26 @@ class RubiController(Plugin):
     FLOAT_EXP = 15
     FLOAT_PREC = 5
     refresh_boards_signal = pyqtSignal()
+    safe_update_signal = pyqtSignal(type(lambda: ()))
 
-    def RubiControllerPanel(self, name):
+    TYPECODE_TO_TYPE = {
+        1: None,
+        2: RubiInt,
+        3: RubiInt,
+        4: RubiInt,
+        5: RubiUnsignedInt,
+        6: RubiUnsignedInt,
+        7: RubiUnsignedInt,
+        8: RubiFloat,
+        9:  RubiString,
+        10: RubiString,
+        11: RubiBool
+    }
+
+    def rubi_controller_panel(self, name):
         return self._widget.findChild(QWidget, name)
 
-    def BoardControllerPanel(self, name):
+    def board_controller_panel(self, name):
         return self._widget2.findChild(QWidget, name)
 
     def subfields_val_cb(self, info, len, data):
@@ -53,15 +81,19 @@ class RubiController(Plugin):
         for num in range(0, len):
             info['chb' + str(num)].setChecked(data.data[num])
 
-    def str_cb(self, str, data):
-        str.setText(str(data.data[0]))
+    @pyqtSlot(type(lambda: ()))
+    def safe_execute(self, func):
+        func()
+
+    def str_cb(self, string, data):
+        string.setText(str(data.data[0]))
 
     def bool_cb(self, bool, data):
         bool.setChecked(data.data[0])
 
     def load_cb(self, data):
         for (can_name, can_load) in zip(self.cans, data.data):
-            lbl_load = self.RubiControllerPanel("load_" + can_name)
+            lbl_load = self.rubi_controller_panel("load_" + can_name)
             lbl_load.setText(str(int(ceil(can_load / 1000.))) + 'k')
 
     @pyqtSlot()
@@ -79,8 +111,10 @@ class RubiController(Plugin):
         val = 0
         if typecode == 8:
             val = RubiFloat()
-        else:
+        elif 2 <= typecode <= 4:
             val = RubiInt()
+        else:
+            val = RubiUnsignedInt()
         for num in range(0, len):
             val.data += [info['spn' + str(num)].value()]
         pub.publish(val)
@@ -93,6 +127,7 @@ class RubiController(Plugin):
         pub.publish(val)
 
     def val_cb(self, val, data):
+        # rospy.loginfo('val %s, currTh %s, as int %s' % (val, QThread.currentThread(), int(QThread.currentThreadId())))
         val.setText(str(data.data[0]))
 
     @pyqtSlot()
@@ -100,8 +135,10 @@ class RubiController(Plugin):
         val = 0
         if typecode == 8:
             val = RubiFloat()
-        else:
+        elif 2 <= typecode <= 4:
             val = RubiInt()
+        else:
+            val = RubiUnsignedInt()
         val.data = [spn.value()]
         pub.publish(val)
 
@@ -118,13 +155,19 @@ class RubiController(Plugin):
         # self._widget2.setVisible(True)
         # rospy.loginfo('RC: GUI for board %s showed\n%s', board, self.boards[board])
 
-        pub_reboot = rospy.Publisher('/rubi/boards/%s/reboot' % board, Empty, queue_size=self.PUB_QSIZE)
-        pub_sleep = rospy.Publisher('/rubi/boards/%s/sleep' % board, Empty, queue_size=self.PUB_QSIZE)
-        pub_wake = rospy.Publisher('/rubi/boards/%s/wake' % board, Empty, queue_size=self.PUB_QSIZE)
-        self.BoardControllerPanel("lbl_reboot").clicked.connect(partial(self.state_clicked, pub_reboot))
-        self.BoardControllerPanel("lbl_sleep").clicked.connect(partial(self.state_clicked, pub_sleep))
-        self.BoardControllerPanel("lbl_wake").clicked.connect(partial(self.state_clicked, pub_wake))
-        self.BoardControllerPanel("lbl_board_name").setText(board)
+        pub_reboot = rospy.Publisher(
+            '/rubi/boards/%s/reboot' % board, Empty, queue_size=self.PUB_QSIZE)
+        pub_sleep = rospy.Publisher(
+            '/rubi/boards/%s/sleep' % board, Empty, queue_size=self.PUB_QSIZE)
+        pub_wake = rospy.Publisher(
+            '/rubi/boards/%s/wake' % board, Empty, queue_size=self.PUB_QSIZE)
+        self.board_controller_panel("lbl_reboot").clicked.connect(
+            partial(self.state_clicked, pub_reboot))
+        self.board_controller_panel("lbl_sleep").clicked.connect(
+            partial(self.state_clicked, pub_sleep))
+        self.board_controller_panel("lbl_wake").clicked.connect(
+            partial(self.state_clicked, pub_wake))
+        self.board_controller_panel("lbl_board_name").setText(board)
         base_next_y = 5
         base_move_y = 30
         base_geo_spacing = 15
@@ -144,248 +187,37 @@ class RubiController(Plugin):
         base_tsh_dim = (261, 30)
         base_tln_x = 80  # text -- long
         base_tln_dim = (261, 140)
-        wid = self.BoardControllerPanel("bScrArWC")
-        for field in self.boards[board]['fields']:
-            rubi_in = '/rubi/boards/' + board + '/fields_to_board/' + field
-            rubi_out = '/rubi/boards/' + board + '/fields_from_board/' + field
+        wid = self.board_controller_panel("bScrArWC")
+
+        builder = RubiInterfaceBuilder()
+
+        for i, field in enumerate(self.boards[board]['fields']):
+            read_topic_name = '/rubi/boards/' + board + '/fields_to_board/' + field
+            write_topic_name = '/rubi/boards/' + board + '/fields_from_board/' + field
             infovc = self.boards[board]['valueChanged']
             infosc = self.boards[board]['stateChanged']
             info = self.boards[board]['fields'][field]
-            # rospy.loginfo(">%s", info)
-            subfields_len = len(info['subfields'])
 
-            # subfields part
-            if subfields_len > 0:
-                info['olb'] = QLabel(wid)
-                info['olb'].setObjectName("olb_" + field)
-                info['olb'].setFixedWidth(base_olb_dim[0])
-                info['olb'].setFixedHeight(base_olb_dim[1])
-                info['olb'].move(base_olb_x, base_next_y)
-                info['olb'].setText(field)
-                info['olb'].setVisible(True)
-                info['sub'] = info['pub'] = 0
-                base_next_y += base_move_y
-                if 2 <= info['typecode'] <= 8:
-                    # RUBI_WRITEONLY
-                    if not info['in']:
-                        for (num, subfield) in enumerate(info['subfields']):
-                            lbl = 'lbl' + str(num)
-                            val = 'val' + str(num)
-                            info[lbl] = QLabel(wid)
-                            info[lbl].setObjectName("lbl_" + field + "_" + str(num))
-                            info[lbl].setFixedWidth(base_alb_dim[0])
-                            info[lbl].setFixedHeight(base_alb_dim[1])
-                            info[lbl].move(base_alb_x, base_next_y)
-                            info[lbl].setText(subfield)
-                            info[lbl].setVisible(True)
-                            info[val] = QLabel(wid)
-                            info[val].setObjectName("val_" + field + "_" + str(num))
-                            info[val].setFixedWidth(base_vlb_dim[0])
-                            info[val].setFixedHeight(base_vlb_dim[1])
-                            info[val].move(base_vlb_x, base_next_y)
-                            info[val].setText('out')
-                            info[val].setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-                            info[val].setVisible(True)
-                            base_next_y += base_move_y
-                        base_next_y -= base_move_y
-                    # RUBI_READONLY or RUBI_READWRITE
-                    else:
-                        for (num, subfield) in enumerate(info['subfields']):
-                            lbl = 'lbl' + str(num)
-                            spn = 'spn' + str(num)
-                            info[lbl] = QLabel(wid)
-                            info[lbl].setObjectName("lbl_" + field + "_" + str(num))
-                            info[lbl].setFixedWidth(base_alb_dim[0])
-                            info[lbl].setFixedHeight(base_alb_dim[1])
-                            info[lbl].move(base_alb_x, base_next_y)
-                            info[lbl].setText(subfield)
-                            info[lbl].setVisible(True)
-                            info[spn] = 0
-                            # float field
-                            if info['typecode'] == 8:
-                                info[spn] = QDoubleSpinBox(wid)
-                                info[spn].setRange(-2**self.FLOAT_EXP, 2**self.FLOAT_EXP-1)
-                                info[spn].setDecimals(self.FLOAT_PREC)
-                            # (u)int field
-                            else:
-                                info[spn] = QSpinBox(wid)
-                                tc = info['typecode']
-                                # int field
-                                if 2 <= tc <= 4:
-                                    info[spn].setRange(-2**self.UINT_EXP[tc], 2**self.UINT_EXP[tc]-1)
-                                # uint field
-                                else:
-                                    info[spn].setRange(0, 2**self.UINT_EXP[tc])
-                            info[spn].setObjectName("spn_" + field + "_" + str(num))
-                            info[spn].setFixedWidth(base_spn_dim[0])
-                            info[spn].setFixedHeight(base_spn_dim[1])
-                            info[spn].move(base_spn_x, base_next_y + base_geo_spn_y)
-                            info[spn].setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-                            info[spn].setKeyboardTracking(False)
-                            info[spn].setVisible(True)
-                            base_next_y += base_move_y
-                        base_next_y -= base_move_y
-                    if not info['in']:
-                        if info['typecode'] == 8:
-                            info['sub'] = rospy.Subscriber(rubi_out, RubiFloat, partial(self.subfields_val_cb, info, subfields_len))
-                        else:
-                            info['sub'] = rospy.Subscriber(rubi_out, RubiInt, partial(self.subfields_val_cb, info, subfields_len))
-                        self.subscribers += [info['sub']]
-                    else:
-                        if info['typecode'] == 8:
-                            info['pub'] = rospy.Publisher(rubi_in, RubiFloat, queue_size=self.PUB_QSIZE)
-                        else:
-                            info['pub'] = rospy.Publisher(rubi_in, RubiInt, queue_size=self.PUB_QSIZE)
-                        for num in range(0, subfields_len):
-                            info['spn' + str(num)].valueChanged.connect(partial(self.subfields_spn_changed, info, subfields_len, info['pub'], info['typecode']))
-                            infovc += [info['spn' + str(num)]]
-                elif info['typecode'] == 11:
-                    for (num, subfield) in enumerate(info['subfields']):
-                        chb = 'chb' + str(num)
-                        info[chb] = QCheckBox(wid)
-                        info[chb].setObjectName("chb_" + field + "_" + str(num))
-                        info[chb].setFixedWidth(base_alb_dim[0])
-                        info[chb].setFixedHeight(base_alb_dim[1])
-                        info[chb].move(base_alb_x, base_next_y)
-                        info[chb].setText(subfield)
-                        info[chb].setCheckable(True)
-                        info[chb].setEnabled(False)
-                        info[chb].setVisible(True)
-                        if info['in']:
-                            info[chb].setEnabled(True)
-                            info['pub'] = rospy.Publisher(rubi_in, RubiBool, queue_size=self.PUB_QSIZE)
-                            info[chb].stateChanged.connect(partial(self.subfields_chb_changed, info, subfields_len, info['pub']))
-                            infosc += [info[chb]]
-                        base_next_y += base_move_y
-                    if not info['in']:
-                        info['sub'] = rospy.Subscriber(rubi_out, RubiBool, partial(self.subfields_bool_cb, info, subfields_len))
-                        self.subscribers += [info['sub']]
-                    base_next_y -= base_move_y
-            # normal field part
-            # (u)int or float field
-            elif 2 <= info['typecode'] <= 8:
-                # RUBI_WRITEONLY
-                if not info['in']:
-                    info['lbl'] = QLabel(wid)
-                    info['lbl'].setObjectName("lbl_" + field)
-                    info['lbl'].setFixedWidth(base_alb_dim[0])
-                    info['lbl'].setFixedHeight(base_alb_dim[1])
-                    info['lbl'].move(base_alb_x, base_next_y)
-                    info['lbl'].setText(field)
-                    info['lbl'].setVisible(True)
-                    info['val'] = QLabel(wid)
-                    info['val'].setObjectName("val_" + field)
-                    info['val'].setFixedWidth(base_vlb_dim[0])
-                    info['val'].setFixedHeight(base_vlb_dim[1])
-                    info['val'].move(base_vlb_x, base_next_y)
-                    info['val'].setText('out')
-                    info['val'].setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-                    info['val'].setVisible(True)
-                    info['sub'] = 0
-                    if info['typecode'] == 8:
-                        info['sub'] = rospy.Subscriber(rubi_out, RubiFloat, partial(self.val_cb, info['val']))
-                    else:
-                        info['sub'] = rospy.Subscriber(rubi_out, RubiInt, partial(self.val_cb, info['val']))
-                    self.subscribers += [info['sub']]
-                # RUBI_READONLY or RUBI_READWRITE
-                else:
-                    info['lbl'] = QLabel(wid)
-                    info['lbl'].setObjectName("lbl_" + field)
-                    info['lbl'].setFixedWidth(base_alb_dim[0])
-                    info['lbl'].setFixedHeight(base_alb_dim[1])
-                    info['lbl'].move(base_alb_x, base_next_y)
-                    info['lbl'].setText(field)
-                    info['lbl'].setVisible(True)
-                    info['spn'] = info['pub'] = 0
-                    # float field
-                    if info['typecode'] == 8:
-                        info['spn'] = QDoubleSpinBox(wid)
-                        info['spn'].setRange(-2**self.FLOAT_EXP, 2**self.FLOAT_EXP-1)
-                        info['spn'].setDecimals(self.FLOAT_PREC)
-                        info['pub'] = rospy.Publisher(rubi_in, RubiFloat, queue_size=self.PUB_QSIZE)
-                    # (u)int field
-                    else:
-                        info['spn'] = QSpinBox(wid)
-                        tc = info['typecode']
-                        # int field
-                        if 2 <= tc <= 4:
-                            info['spn'].setRange(-2**self.UINT_EXP[tc], 2**self.UINT_EXP[tc]-1)
-                        # uint field
-                        else:
-                            info['spn'].setRange(0, 2**self.UINT_EXP[tc])
-                        info['pub'] = rospy.Publisher(rubi_in, RubiInt, queue_size=self.PUB_QSIZE)
-                    info['spn'].setObjectName("spn_" + field)
-                    info['spn'].setFixedWidth(base_spn_dim[0])
-                    info['spn'].setFixedHeight(base_spn_dim[1])
-                    info['spn'].move(base_spn_x, base_next_y + base_geo_spn_y)
-                    info['spn'].setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-                    info['spn'].setKeyboardTracking(False)
-                    info['spn'].setVisible(True)
-                    info['spn'].valueChanged.connect(partial(self.spn_changed, info['spn'], info['pub'], info['typecode']))
-                    infovc += [info['spn']]
-            # string field
-            elif 9 <= info['typecode'] <= 10:
-                info['lbl'] = QLabel(wid)
-                info['lbl'].setObjectName("lbl_" + field)
-                info['lbl'].setFixedWidth(base_alb_dim[0])
-                info['lbl'].setFixedHeight(base_alb_dim[1])
-                info['lbl'].move(base_alb_x, base_next_y)
-                info['lbl'].setText(field)
-                info['lbl'].setVisible(True)
-                info['pub'] = info['sub'] = 0
-                info['str'] = QTextEdit(wid)
-                # short field
-                if info['typecode'] == 9:
-                    info['str'].setObjectName("tsh_" + field)
-                    info['str'].setFixedWidth(base_tsh_dim[0])
-                    info['str'].setFixedHeight(base_tsh_dim[1])
-                    info['str'].move(base_tsh_x, base_next_y + base_geo_str_y)
-                    info['str'].setText('short string 01234567890')
-                # long field
-                else:
-                    info['str'].setObjectName("tln_" + field)
-                    info['str'].setFixedWidth(base_tln_dim[0])
-                    info['str'].setFixedHeight(base_tln_dim[1])
-                    info['str'].move(base_tln_x, base_next_y + base_geo_str_y)
-                    info['str'].setText('long string 123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123')
-                    base_next_y += base_geo_tln_next
-                info['str'].setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-                info['str'].setStyleSheet("font-family:'Sans Serif'; font-size:9pt;")
-                info['str'].setVisible(True)
-                if not info['in']:
-                    info['str'].setReadOnly(True)
-                    info['sub'] = rospy.Subscriber(rubi_out, RubiString, partial(self.str_cb, info['str']))
-                    self.subscribers += [info['sub']]
-                else:
-                    info['pub'] = rospy.Publisher(rubi_in, RubiString, queue_size=self.PUB_QSIZE)
-                    info['str'].installEventFilter(self.qet_ef)
-                base_next_y += base_geo_str_spacing
-                base_next_y += base_geo_str_y
-            # bool field
-            elif info['typecode'] == 11:
-                info['chb'] = QCheckBox(wid)
-                info['chb'].setObjectName("chb_" + field)
-                info['chb'].setFixedWidth(base_alb_dim[0])
-                info['chb'].setFixedHeight(base_alb_dim[1])
-                info['chb'].move(base_alb_x, base_next_y)
-                info['chb'].setText(field)
-                info['chb'].setCheckable(True)
-                info['chb'].setVisible(True)
-                info['pub'] = info['sub'] = 0
-                if not info['in']:
-                    info['chb'].setEnabled(False)
-                    info['sub'] = rospy.Subscriber(rubi_out, RubiBool, partial(self.bool_cb, info['chb']))
-                    self.subscribers += [info['sub']]
-                else:
-                    info['chb'].setEnabled(True)
-                    info['pub'] = rospy.Publisher(rubi_in, RubiBool, queue_size=self.PUB_QSIZE)
-                    info['chb'].stateChanged.connect(partial(self.chb_changed, info['chb'], info['pub']))
-                    infosc += [info['chb']]
-            else:
-                rospy.logwarn("RC: show_board_window(): board %s, field %s with typecode %s", board, field, info['typecode'])
+            ros_pub_handler = None
+            if info['in']:
+                read_topic = rospy.Publisher(read_topic_name, self.TYPECODE_TO_TYPE[info['typecode']],
+                                             queue_size=self.PUB_QSIZE)
 
-            base_next_y += base_move_y
-            base_next_y += base_geo_spacing
+                def ros_pub_handler(fields, read_topic=read_topic): return \
+                    read_topic.publish(
+                        self.TYPECODE_TO_TYPE[info['typecode']](fields))
+
+            write_handler = \
+                builder.build_field(
+                    wid, field, info['typecode'], ros_pub_handler, info['out'], info['subfields'])
+
+            if info['out']:
+                print(write_handler, info['out'])
+                ros_sub_handler = \
+                    lambda data, h=write_handler: self.safe_update_signal.emit(
+                        lambda: h(data.data))
+                sub = rospy.Subscriber(
+                    write_topic_name, self.TYPECODE_TO_TYPE[info['typecode']], ros_sub_handler)
 
         # sleep/wake part
         nope = QLabel(wid)
@@ -401,7 +233,7 @@ class RubiController(Plugin):
             th = self.boards[board]['srv_wake']().wake
         except Exception as e:
             rospy.logwarn("RC: show_board_window(): exception during srv_wake for board %s, e=%s",
-                           board, e)
+                          board, e)
             th = False
         # todo why no thread crash?
         # rospy.logerr("th %s", th)
@@ -410,7 +242,8 @@ class RubiController(Plugin):
 
         wid.setMinimumHeight(base_next_y)
 
-        self.timers += [rospy.Timer(rospy.Duration(2), partial(self.watch_board_cb, board))]
+        self.timers += [rospy.Timer(rospy.Duration(2),
+                                    partial(self.watch_board_cb, board))]
 
     @pyqtSlot()
     def clear_gui(self):
@@ -431,7 +264,7 @@ class RubiController(Plugin):
         base_can_name_dim = (91, 41)
         base_can_load_x = 110
         base_can_load_dim = (61, 41)
-        info_panel = self.RubiControllerPanel("INFO")
+        info_panel = self.rubi_controller_panel("INFO")
         can_load = '/rubi/cans_load/'
         # todo cans could change in runtime (after driver reset)
         if not self.cans:
@@ -458,8 +291,10 @@ class RubiController(Plugin):
         self.subscribers += [sub]
         info_panel.setMinimumHeight(111 + base_can_move * len(self.cans))
 
-        self.RubiControllerPanel("btn_panic").move(base_can_move, base_can_move * (len(self.cans) + 2))
-        self.RubiControllerPanel("btn_panic").clicked.connect(self.panic_clicked)
+        self.rubi_controller_panel("btn_panic").move(
+            base_can_move, base_can_move * (len(self.cans) + 2))
+        self.rubi_controller_panel(
+            "btn_panic").clicked.connect(self.panic_clicked)
 
         # boards part
         base_geo_move = 30
@@ -471,7 +306,7 @@ class RubiController(Plugin):
         base_lbl_dim = (161, 41)
         base_pb_xy = [230, 10]  # pushbutton
         base_pb_dim = (91, 31)
-        wid = self.RubiControllerPanel("bScrArWC")
+        wid = self.rubi_controller_panel("bScrArWC")
         for board in self.boards:
             if board in self.curr_gui_boards:
                 # rospy.loginfo("%s moved to %s", board, base_chb_xy[1])
@@ -490,7 +325,8 @@ class RubiController(Plugin):
                 self.boards[board]['chb'].setChecked(False)
                 self.boards[board]['chb'].setEnabled(False)
                 self.boards[board]['chb'].setVisible(True)
-                self.boards[board]['srv_online'] = rospy.ServiceProxy('/rubi/boards/' + board + "/is_online", BoardOnline)
+                self.boards[board]['srv_online'] = rospy.ServiceProxy(
+                    '/rubi/boards/' + board + "/is_online", BoardOnline)
                 self.boards[board]['cb2'] = QCheckBox(wid)
                 self.boards[board]['cb2'].setObjectName("cb2_" + board)
                 self.boards[board]['cb2'].setFixedWidth(base_cb2_dim[0])
@@ -500,7 +336,8 @@ class RubiController(Plugin):
                 self.boards[board]['cb2'].setChecked(False)
                 self.boards[board]['cb2'].setEnabled(False)
                 self.boards[board]['cb2'].setVisible(True)
-                self.boards[board]['srv_wake'] = rospy.ServiceProxy('/rubi/boards/' + board + "/is_wake", BoardWake)
+                self.boards[board]['srv_wake'] = rospy.ServiceProxy(
+                    '/rubi/boards/' + board + "/is_wake", BoardWake)
 
                 self.boards[board]['lbl'] = QLabel(wid)
                 self.boards[board]['lbl'].setObjectName("lbl_" + board)
@@ -515,7 +352,8 @@ class RubiController(Plugin):
                 self.boards[board]['pb'].setFixedHeight(base_pb_dim[1])
                 self.boards[board]['pb'].move(base_pb_xy[0], base_pb_xy[1])
                 self.boards[board]['pb'].setText("CONNECT")
-                self.boards[board]['pb'].clicked.connect(partial(self.show_board_window, board))
+                self.boards[board]['pb'].clicked.connect(
+                    partial(self.show_board_window, board))
                 self.boards[board]['pb'].setVisible(True)
 
                 self.curr_gui_boards += [board]
@@ -537,12 +375,11 @@ class RubiController(Plugin):
         # self.InputPanel("ISENSITIVITY").setValue(self.sensitivity_level)
         # self.MainPanel("LUPS").setText(str(self.status.ups))
         # self.Widget2("BBR").setChecked(False)
-        # wid = self.RubiControllerPanel("pb_FakeBoard1")
-        # wid2 = self.RubiControllerPanel("pb_FakeBoard2")
+        # wid = self.rubi_controller_panel("pb_FakeBoard1")
+        # wid2 = self.rubi_controller_panel("pb_FakeBoard2")
         # rospy.loginfo("pb fbs: %s -- %s", wid, wid2)
 
     @pyqtSlot()
-    # todo boards dissapear
     def check_boards(self):
         # self.RubiControllerPanel("chb_online").setChecked(False)
         try:
@@ -551,7 +388,8 @@ class RubiController(Plugin):
             boards_names = show_boards().boards_names
 
             rospy.wait_for_service('/rubi/get_board_instances', timeout=1)
-            board_instances = rospy.ServiceProxy('/rubi/get_board_instances', BoardInstances)
+            board_instances = rospy.ServiceProxy(
+                '/rubi/get_board_instances', BoardInstances)
 
             resp = []
             for bn in boards_names:
@@ -561,22 +399,23 @@ class RubiController(Plugin):
                     else:
                         instance_name = bn + "/" + id
 
-                    name = {"instance_name" : instance_name, "descriptor_name" : bn}
+                    name = {"instance_name": instance_name,
+                            "descriptor_name": bn}
                     resp.append(name)
 
-            self.RubiControllerPanel("chb_online").setChecked(True)
+            self.rubi_controller_panel("chb_online").setChecked(True)
             return resp
         except rospy.ROSException:
-            self.RubiControllerPanel("chb_online").setChecked(False)
+            self.rubi_controller_panel("chb_online").setChecked(False)
         except rospy.ServiceException as e:
             rospy.logwarn("RC: ros services call failed: %s", e)
-
 
     @pyqtSlot()
     def get_board_info(self, board_name):
         rospy.loginfo("RC: trying get info about %s", board_name)
         try:
-            info = OrderedDict([(self.CFL, OrderedDict()), (self.CFN, OrderedDict())])
+            info = OrderedDict(
+                [(self.CFL, OrderedDict()), (self.CFN, OrderedDict())])
             board_info = rospy.ServiceProxy(
                 '/rubi/get_board_descriptor', BoardDescriptor
             )
@@ -641,13 +480,13 @@ class RubiController(Plugin):
                     self.boards[board]['cb2'].setChecked(False)
 
         boards_names = self.check_boards()
-
         if boards_names:
             changed = 0
             for board in boards_names:
                 board_name = board["instance_name"]
                 if board_name not in self.boards:
-                    self.boards[board_name] = self.get_board_info(board["descriptor_name"])
+                    self.boards[board_name] = self.get_board_info(
+                        board["descriptor_name"])
                     changed += 1
             if changed > 0:
                 self.refresh_boards_signal.emit()
@@ -661,18 +500,18 @@ class RubiController(Plugin):
         curr_watch = False
         try:
             curr_watch = self.boards[board]['srv_online']().online
-            self.boards[board]['nope'].setVisible(not self.boards[board]['srv_wake']().wake)
+            self.boards[board]['nope'].setVisible(
+                not self.boards[board]['srv_wake']().wake)
         except rospy.ServiceException:
             curr_watch = False
         # todo
         # if not self.last_watch and curr_watch:
             # for vc in self.boards[board]['valueChanged']:
-                # QMetaObject.invokeMethod(vc, "valueChanged", Qt.QueuedConnection, Q_ARG(double, 0.))
-                # QMetaObject.invokeMethod(vc, "valueChanged", Qt.QueuedConnection, Q_ARG(int, 0))
+            # QMetaObject.invokeMethod(vc, "valueChanged", Qt.QueuedConnection, Q_ARG(double, 0.))
+            # QMetaObject.invokeMethod(vc, "valueChanged", Qt.QueuedConnection, Q_ARG(int, 0))
             # for sc in self.boards[board]['stateChanged']:
-                # QMetaObject.invokeMethod(sc, "stateChanged", Qt.QueuedConnection, Q_ARG(int, 0))
+            # QMetaObject.invokeMethod(sc, "stateChanged", Qt.QueuedConnection, Q_ARG(int, 0))
         self.last_watch = curr_watch
-
 
     def __init__(self, context):
         super(RubiController, self).__init__(context)
@@ -684,7 +523,8 @@ class RubiController(Plugin):
         self.context = context
         self.cans = []
         self.last_watch = True
-        self.panic_pub = rospy.Publisher('/rubi/panic', Empty, queue_size=self.PUB_QSIZE)
+        self.panic_pub = rospy.Publisher(
+            '/rubi/panic', Empty, queue_size=self.PUB_QSIZE)
         self.qet_ef = QTextEditEventFilter()
         self.qsb_ef = QSpinBoxEventFilter()
 
@@ -693,7 +533,7 @@ class RubiController(Plugin):
         self._widget = QWidget()
         ui_file = os.path.join(
             rospkg.RosPack().get_path("aleph2_gui"),
-            "resources/ui/rubi.ui"
+            "resources/ui/rubi_controller.ui"
         )
         loadUi(ui_file, self._widget)
         # self._widget.setObjectName('RubiControllerUi')
@@ -701,11 +541,13 @@ class RubiController(Plugin):
         self._widget2 = QWidget()
         ui_file2 = os.path.join(
             rospkg.RosPack().get_path("aleph2_gui"),
-            "resources/ui/rubi-board.ui"
+            "resources/ui/rubi_controller_board.ui"
         )
         loadUi(ui_file2, self._widget2)
         # self._widget2.setObjectName('BoardControllerUi')
+
         self.refresh_boards_signal.connect(self.refresh_boards)
+        self.safe_update_signal.connect(self.safe_execute)
 
         # self.subscribers += [rospy.Subscriber("/rubi/new_boards",
         #                       BoardAnnounce, self.board_announ_cb)]
@@ -726,20 +568,3 @@ class RubiController(Plugin):
             subscriber.unregister()
         for timer in self.timers:
             timer.shutdown()
-        # print(">> %s\n" % self.boards['FakeBoard2']['fields'])
-        # print(">> %s\n" % self.boards['FakeBoard2']['fields']['IntTest']['sub'])
-
-    def save_settings(self, plugin_settings, instance_settings):
-        # TODO save intrinsic configuration, usually using:
-        # instance_settings.set_value(k, v)
-        pass
-
-    def restore_settings(self, plugin_settings, instance_settings):
-        # TODO restore intrinsic configuration, usually using:
-        # v = instance_settings.value(k)
-        pass
-
-    # def trigger_configuration(self):
-        # Comment in to signal that the plugin has a way to configure
-        # This will enable a setting button (gear icon) in each dock widget title bar
-        # Usually used to open a modal configuration dialog
