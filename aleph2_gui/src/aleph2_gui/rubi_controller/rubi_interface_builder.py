@@ -45,7 +45,7 @@ class RubiInterfaceBuilder:
             self.TYPECODE_int32_t: self.build_int_widget
         }
 
-        self.vertial_cursor = 5
+        self.vertical_cursor = 5
         self.name_counter = 0
 
     def build_int_widget(self, container, typecode, read, write):
@@ -115,7 +115,7 @@ class RubiInterfaceBuilder:
 
     def build_field_with_subfields(self, container, name, typecode, toplevel_read_handler, write, subfields):
         self.make_label(container, self.TITLE_MARGIN,
-                        self.horizontal_size, name)
+                        self.HORIZONTAL_SIZE, name)
         self.vertical_cursor += self.VERTICAL_STEP
 
         widgets = []
@@ -135,13 +135,13 @@ class RubiInterfaceBuilder:
             self.vertical_cursor += step_boost
 
             self.make_label(container, self.TITLE_MARGIN,
-                            self.horizontal_pivot, subfield)
+                            self.HORIZONTAL_PIVOT, subfield)
 
             if columns == 0:
                 widget.setFixedWidth(
-                    self.horizontal_size - self.horizontal_pivot)
+                    self.HORIZONTAL_SIZE - self.HORIZONTAL_PIVOT)
                 widget.setFixedHeight(height)
-                widget.move(self.horizontal_pivot + margin,
+                widget.move(self.HORIZONTAL_PIVOT + margin,
                             self.vertical_cursor + step_boost)
 
                 self.vertical_cursor += self.VERTICAL_STEP
