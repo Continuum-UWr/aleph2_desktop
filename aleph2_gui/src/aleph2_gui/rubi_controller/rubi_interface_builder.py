@@ -99,11 +99,11 @@ class RubiInterfaceBuilder:
         for widget, data in zip(widgets, datas):
             widget.setText(str(data))
 
-    def build_field(self, container, name, typecode, read_handler, write_handler, subfields):
+    def build_field(self, container, name, typecode, read_handler, write, subfields):
         if len(subfields) > 0:
-            return self.build_field_with_subfields(container, name, typecode, read_handler, write_handler, subfields)
+            return self.build_field_with_subfields(container, name, typecode, read_handler, write, subfields)
         else:
-            return self.build_field_no_subfields(container, name, typecode, read_handler, write_handler)
+            return self.build_field_no_subfields(container, name, typecode, read_handler, write)
 
     def make_label(self, container, x, dim, text):
         field_label = QLabel(container)
@@ -165,5 +165,48 @@ class RubiInterfaceBuilder:
 
         return None
 
-    def build_field_no_subfields(self, container, name, typecode, read_handler, write_handler):
-        assert(False)
+    def build_field_no_subfields(self, container, name, typecode, read_handler, write):
+        #widgets = []
+        write_handler = None
+        read = read_handler is not None
+
+        #read_stuffs = []
+        #
+        (widget, read_stuff, write_handler) = \
+            self.WIDGET_BUILDERS[typecode](
+                container, typecode, read, write)
+
+        (columns, height, margin,
+         step_boost) = self.GEOMETRY[(typecode, read)]
+
+        self.vertical_cursor += step_boost
+
+        self.make_label(container, self.TITLE_MARGIN,
+                        self.HORIZONTAL_PIVOT, name)
+
+        if columns == 0:
+            widget.setFixedWidth(
+                self.HORIZONTAL_SIZE - self.HORIZONTAL_PIVOT)
+            widget.setFixedHeight(height)
+            widget.move(self.HORIZONTAL_PIVOT + margin,
+                        self.vertical_cursor + step_boost)
+
+            self.vertical_cursor += self.VERTICAL_STEP
+        else:
+            assert(0)
+
+        #widgets += [widget]
+        #read_stuffs += [read_stuff]
+
+        if read:
+            def handler(): return read_handler(
+                [get_value_handler() for (_, get_value_handler) in [read_stuff]])
+            for connect_read_handler, _ in [read_stuff]:
+                connect_read_handler(handler)
+
+        self.vertical_cursor += self.VERTICAL_HALFSTEP
+
+        if write:
+            return partial(write_handler, [widget])
+
+        return None
