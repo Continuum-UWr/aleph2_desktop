@@ -78,15 +78,16 @@ class RubiInterfaceBuilder:
         self.name_counter += 1
         return "windget" + str(self.name_counter)
 
-    def write_handler_bool(widgets, datas):
+    def write_handler_bool(self, widgets, datas):
         for widget, data in zip(widgets, datas.data):
             widget.setChecked(data)
 
-    def write_handler_string(widgets, datas):
+    def write_handler_string(self, widgets, datas):
         for widget, data in zip(widgets, datas.data):
             widget.setText(data)
 
-    def write_handler_int_spinbox(widgets, datas):
+    def write_handler_int_spinbox(self, widgets, datas):
+        print(datas)
         for widget, data in zip(widgets, datas.data):
             widget.setValue(data)
 
@@ -94,7 +95,7 @@ class RubiInterfaceBuilder:
         for widget, data in zip(widgets, datas):
             widget.setText(str(data))
 
-    def write_handler_float_label(widgets, datas):
+    def write_handler_float_label(self, widgets, datas):
         for widget, data in zip(widgets, datas.data):
             widget.setText(str(data))
 
