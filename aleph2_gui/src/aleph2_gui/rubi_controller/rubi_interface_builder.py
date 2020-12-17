@@ -9,45 +9,44 @@ from python_qt_binding.QtGui import QPixmap
 
 
 class RubiInterfaceBuilder:
+
+    TYPECODE_void = 1
+    TYPECODE_int32_t = 2
+    TYPECODE_int16_t = 3
+    TYPECODE_int8_t = 4
+    TYPECODE_uint32_t = 5
+    TYPECODE_uint16_t = 6
+    TYPECODE_uint8_t = 7
+    TYPECODE_float = 8
+    TYPECODE_shortstring = 9
+    TYPECODE_longstring = 10
+    TYPECODE_bool_t = 11
+    TYPECODE_RUBI_ENUM1 = 12
+
+    VERTICAL_STEP = 34
+    VERTICAL_HALFSTEP = 15
+    VERTICAL_TITLE_DIM = (330, 41)
+    TITLE_MARGIN = 5
+    TITLE_HEIGHT = 41
+
+    HORIZONTAL_SIZE = 340
+    HORIZONTAL_PIVOT = 0.65 * 350
+    HORIZONTAL_DOUBLEMARGINS = 15
+
+    GEOMETRY = {
+        # (typecode, read) : (columns, height, horizontal_offset, vertical_boost)
+        (TYPECODE_int32_t, False): (0, 41, 8, 0),
+        (TYPECODE_int32_t, True): (0, 24, 8, 8)
+    }
+
     def __init__(self):
-        self.name_counter = 0
-
-        self.TYPECODE_void = 1
-        self.TYPECODE_int32_t = 2
-        self.TYPECODE_int16_t = 3
-        self.TYPECODE_int8_t = 4
-        self.TYPECODE_uint32_t = 5
-        self.TYPECODE_uint16_t = 6
-        self.TYPECODE_uint8_t = 7
-        self.TYPECODE_float = 8
-        self.TYPECODE_shortstring = 9
-        self.TYPECODE_longstring = 10
-        self.TYPECODE_bool_t = 11
-        self.TYPECODE_RUBI_ENUM1 = 12
-
-        self.VERTICAL_STEP = 34
-        self.VERTICAL_HALFSTEP = 15
-        self.VERTICAL_TITLE_DIM = (330, 41)
-        self.TITLE_MARGIN = 5
-        self.TITLE_HEIGHT = 41
-
-        self.horizontal_size = 340
-        self.horizontal_pivot = 0.65 * 350
-
-        self.vertical_cursor = 5
-
-        self.GEOMETRY = {
-            # (typecode, read) : (columns, height, horizontal_offset, vertical_boost)
-            (self.TYPECODE_int32_t, False): (0, 41, 8, 0),
-            (self.TYPECODE_int32_t, True): (0, 24, 8, 8)
-        }
 
         self.WIDGET_BUILDERS = {
             self.TYPECODE_int32_t: self.build_int_widget
         }
 
-        self.HORIZONTAL_DOUBLEMARGINS = 15
         self.vertial_cursor = 5
+        self.name_counter = 0
 
     def build_int_widget(self, container, typecode, read, write):
         if read:
