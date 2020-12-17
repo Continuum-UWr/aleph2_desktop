@@ -24,8 +24,8 @@ import rospkg
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget
-from python_qt_binding.QtCore import pyqtSlot, pyqtSignal
+from python_qt_binding.QtWidgets import QWidget, QLabel, QCheckBox, QPushButton
+from python_qt_binding.QtCore import pyqtSlot, pyqtSignal, Qt
 
 from std_msgs.msg import Empty, Float32MultiArray
 from rubi_server.msg import RubiInt, RubiUnsignedInt, RubiFloat, RubiString, RubiBool
