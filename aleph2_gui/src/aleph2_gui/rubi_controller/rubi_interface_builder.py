@@ -54,6 +54,7 @@ class RubiInterfaceBuilder:
             ret.setObjectName(self.make_name())
             ret.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             ret.setKeyboardTracking(False)
+            ret.setRange(-2147483648,2147483647)
             ret.setVisible(True)
 
             def connect_read_handler(handler):
@@ -79,16 +80,15 @@ class RubiInterfaceBuilder:
         return "windget" + str(self.name_counter)
 
     def write_handler_bool(self, widgets, datas):
-        for widget, data in zip(widgets, datas.data):
+        for widget, data in zip(widgets, datas):
             widget.setChecked(data)
 
     def write_handler_string(self, widgets, datas):
-        for widget, data in zip(widgets, datas.data):
+        for widget, data in zip(widgets, datas):
             widget.setText(data)
 
     def write_handler_int_spinbox(self, widgets, datas):
-        print(datas)
-        for widget, data in zip(widgets, datas.data):
+        for widget, data in zip(widgets, datas):
             widget.setValue(data)
 
     def write_handler_int_label(self, widgets, datas):
@@ -96,7 +96,7 @@ class RubiInterfaceBuilder:
             widget.setText(str(data))
 
     def write_handler_float_label(self, widgets, datas):
-        for widget, data in zip(widgets, datas.data):
+        for widget, data in zip(widgets, datas):
             widget.setText(str(data))
 
     def build_field(self, container, name, typecode, read_handler, write_handler, subfields):
@@ -162,9 +162,8 @@ class RubiInterfaceBuilder:
 
         if write:
             return partial(write_handler, widgets)
-        else:
-            print("ZWRACAM KURWE", write)
-            return "kurwa"
+
+        return None
 
     def build_field_no_subfields(self, container, name, typecode, read_handler, write_handler):
         assert(False)
