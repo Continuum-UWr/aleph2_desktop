@@ -30,7 +30,7 @@ class RubiInterfaceBuilder:
     TITLE_HEIGHT = 41
 
     HORIZONTAL_SIZE = 340
-    HORIZONTAL_PIVOT = 0.65 * 350
+    HORIZONTAL_PIVOT = int(0.65 * HORIZONTAL_SIZE)
     HORIZONTAL_DOUBLEMARGINS = 15
 
     GEOMETRY = {
@@ -54,7 +54,7 @@ class RubiInterfaceBuilder:
             ret.setObjectName(self.make_name())
             ret.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             ret.setKeyboardTracking(False)
-            ret.setRange(-2147483648,2147483647)
+            ret.setRange(-2147483648, 2147483647)
             ret.setVisible(True)
 
             def connect_read_handler(handler):
@@ -126,12 +126,11 @@ class RubiInterfaceBuilder:
         read_stuffs = []
 
         for subfield in subfields:
-            (widget, read_stuff, write_handler) = \
-                self.WIDGET_BUILDERS[typecode](
-                    container, typecode, read, write)
+            widget, read_stuff, write_handler = self.WIDGET_BUILDERS[typecode](
+                container, typecode, read, write)
 
-            (columns, height, margin,
-             step_boost) = self.GEOMETRY[(typecode, read)]
+            columns, height, margin, step_boost = self.GEOMETRY[(
+                typecode, read)]
 
             self.vertical_cursor += step_boost
 
@@ -166,18 +165,13 @@ class RubiInterfaceBuilder:
         return None
 
     def build_field_no_subfields(self, container, name, typecode, read_handler, write):
-        #widgets = []
         write_handler = None
         read = read_handler is not None
 
-        #read_stuffs = []
-        #
-        (widget, read_stuff, write_handler) = \
-            self.WIDGET_BUILDERS[typecode](
-                container, typecode, read, write)
+        widget, read_stuff, write_handler = self.WIDGET_BUILDERS[typecode](
+            container, typecode, read, write)
 
-        (columns, height, margin,
-         step_boost) = self.GEOMETRY[(typecode, read)]
+        columns, height, margin, step_boost = self.GEOMETRY[(typecode, read)]
 
         self.vertical_cursor += step_boost
 
@@ -194,9 +188,6 @@ class RubiInterfaceBuilder:
             self.vertical_cursor += self.VERTICAL_STEP
         else:
             assert(0)
-
-        #widgets += [widget]
-        #read_stuffs += [read_stuff]
 
         if read:
             def handler(): return read_handler(
