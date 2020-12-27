@@ -36,13 +36,16 @@ class RubiInterfaceBuilder:
     GEOMETRY = {
         # (typecode, read) : (columns, height, horizontal_offset, vertical_boost)
         (TYPECODE_int32_t, False): (0, 41, 8, 0),
-        (TYPECODE_int32_t, True): (0, 24, 8, 8)
+        (TYPECODE_int32_t, True): (0, 24, 8, 8),
+        (TYPECODE_bool_t, False): (0, 36, 8, 0),
+        (TYPECODE_bool_t, True): (0, 36, 8, 0)
     }
 
     def __init__(self):
 
         self.WIDGET_BUILDERS = {
-            self.TYPECODE_int32_t: self.build_int_widget
+            self.TYPECODE_int32_t: self.build_int_widget,
+            self.TYPECODE_bool_t: self.build_bool_widget
         }
 
         self.vertical_cursor = 5
@@ -74,6 +77,32 @@ class RubiInterfaceBuilder:
             ret.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             ret.setVisible(True)
             return (ret, None, self.write_handler_int_label)
+
+    def build_bool_widget(self, container, typecode, read, write):
+        ret = QCheckBox(container)
+        ret.setObjectName(self.make_name())
+        
+        if read:
+            ret.setCheckable(True)
+            ret.setEnabled(True)  
+            ret.setVisible(True)
+
+            def connect_read_handler(handler):
+                return ret.stateChanged.connect(handler)
+
+            def get_value_handler():
+                return ret.checkState();
+
+            if write:
+                return (ret, (connect_read_handler, get_value_handler), self.write_handler_bool)
+            else:
+                return (ret, (connect_read_handler, get_value_handler), None)
+        else:
+            ret.setChecked(False)
+            #ret.setCheckable(False)
+            ret.setEnabled(False)
+            ret.setVisible(True)
+            return (ret, None, self.write_handler_bool)
 
     def make_name(self):
         self.name_counter += 1
