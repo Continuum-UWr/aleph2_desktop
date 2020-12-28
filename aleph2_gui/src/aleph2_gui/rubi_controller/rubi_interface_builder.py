@@ -23,6 +23,10 @@ class RubiInterfaceBuilder:
     TYPECODE_bool_t = 11
     TYPECODE_RUBI_ENUM1 = 12
 
+    FLOAT_EXP = 15
+    FLOAT_PREC = 5
+    FLOAT_STEP = 0.01
+
     VERTICAL_STEP = 34
     VERTICAL_HALFSTEP = 15
     VERTICAL_TITLE_DIM = (330, 41)
@@ -33,19 +37,47 @@ class RubiInterfaceBuilder:
     HORIZONTAL_PIVOT = int(0.65 * HORIZONTAL_SIZE)
     HORIZONTAL_DOUBLEMARGINS = 15
 
+    INT_RANGES = {
+        #int type: (min, max)
+        TYPECODE_int32_t: (-2147483648, 2147483647), 
+        TYPECODE_int16_t: (-32768, 32767),
+        TYPECODE_int8_t: (-128, 127),
+        TYPECODE_uint32_t: (0, 4294967295), 
+        TYPECODE_uint16_t: (0, 65535),
+        TYPECODE_uint8_t: (0, 255)
+    }
+
     GEOMETRY = {
         # (typecode, read) : (columns, height, horizontal_offset, vertical_boost)
         (TYPECODE_int32_t, False): (0, 41, 8, 0),
         (TYPECODE_int32_t, True): (0, 24, 8, 8),
+        (TYPECODE_int16_t, False): (0, 41, 8, 0),
+        (TYPECODE_int16_t, True): (0, 24, 8, 8),
+        (TYPECODE_int8_t, False): (0, 41, 8, 0),
+        (TYPECODE_int8_t, True): (0, 24, 8, 8),
+        (TYPECODE_uint32_t, False): (0, 41, 8, 0),
+        (TYPECODE_uint32_t, True): (0, 24, 8, 8),
+        (TYPECODE_uint16_t, False): (0, 41, 8, 0),
+        (TYPECODE_uint16_t, True): (0, 24, 8, 8),
+        (TYPECODE_uint8_t, False): (0, 41, 8, 0),
+        (TYPECODE_uint8_t, True): (0, 24, 8, 8),
         (TYPECODE_bool_t, False): (0, 36, 8, 0),
-        (TYPECODE_bool_t, True): (0, 36, 8, 0)
+        (TYPECODE_bool_t, True): (0, 36, 8, 0),
+        (TYPECODE_float, False): (0, 41, 8, 0),
+        (TYPECODE_float, True): (0, 24, 8, 8)
     }
 
     def __init__(self):
 
         self.WIDGET_BUILDERS = {
             self.TYPECODE_int32_t: self.build_int_widget,
-            self.TYPECODE_bool_t: self.build_bool_widget
+            self.TYPECODE_int16_t: self.build_int_widget,
+            self.TYPECODE_int8_t: self.build_int_widget,
+            self.TYPECODE_uint32_t: self.build_int_widget,
+            self.TYPECODE_uint16_t: self.build_int_widget,
+            self.TYPECODE_uint8_t: self.build_int_widget,
+            self.TYPECODE_bool_t: self.build_bool_widget,
+            self.TYPECODE_float: self.build_float_widget
         }
 
         self.vertical_cursor = 5
@@ -57,7 +89,7 @@ class RubiInterfaceBuilder:
             ret.setObjectName(self.make_name())
             ret.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             ret.setKeyboardTracking(False)
-            ret.setRange(-2147483648, 2147483647)
+            ret.setRange(self.INT_RANGES[typecode][0], self.INT_RANGES[typecode][1])
             ret.setVisible(True)
 
             def connect_read_handler(handler):
@@ -99,10 +131,38 @@ class RubiInterfaceBuilder:
                 return (ret, (connect_read_handler, get_value_handler), None)
         else:
             ret.setChecked(False)
-            #ret.setCheckable(False)
             ret.setEnabled(False)
             ret.setVisible(True)
             return (ret, None, self.write_handler_bool)
+
+    def build_float_widget(self, container, typecode, read, write):
+        if read:
+            ret = QDoubleSpinBox(container)
+            ret.setObjectName(self.make_name())
+            ret.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            ret.setKeyboardTracking(False)
+            ret.setRange(-2**self.FLOAT_EXP, 2**self.FLOAT_EXP-1)
+            ret.setDecimals(self.FLOAT_PREC)
+            ret.setSingleStep(self.FLOAT_STEP)
+            
+
+            def connect_read_handler(handler):
+                return ret.valueChanged.connect(handler)
+
+            def get_value_handler():
+                return ret.value()
+
+            if write:
+                return (ret, (connect_read_handler, get_value_handler), self.write_handler_float_spinbox)
+            else:
+                return (ret, (connect_read_handler, get_value_handler), None)
+        else:
+            ret = QLabel(container)
+            ret.setObjectName(self.make_name())
+            ret.setText('out')
+            ret.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            ret.setVisible(True)
+            return (ret, None, self.write_handler_float_label)
 
     def make_name(self):
         self.name_counter += 1
@@ -126,7 +186,12 @@ class RubiInterfaceBuilder:
 
     def write_handler_float_label(self, widgets, datas):
         for widget, data in zip(widgets, datas):
-            widget.setText(str(data))
+            rndData = round(data, self.FLOAT_PREC+1)
+            widget.setText("{value:.{prec}f}".format(value=rndData,prec=self.FLOAT_PREC))
+    
+    def write_handler_float_spinbox(self, widgets, datas):
+        for widget, data in zip(widgets, datas):
+            widget.setValue(data)
 
     def build_field(self, container, name, typecode, read_handler, write, subfields):
         if len(subfields) > 0:

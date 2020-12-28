@@ -199,26 +199,13 @@ class RubiController(Plugin):
             infosc = self.boards[board]['stateChanged']
             info = self.boards[board]['fields'][field]
 
-            print("----------------info----------------")
-            print(info)
-            print(field)
-            print(info['typecode'])
-            print("---------------po info--------------\n")
-
             ros_pub_handler = None
 
             if info['in']:
                 read_topic = rospy.Publisher(read_topic_name, self.TYPECODE_TO_TYPE[info['typecode']],
                                              queue_size=self.PUB_QSIZE)
 
-                def ros_pub_handler(fields, read_topic=read_topic): 
-                    print("------------w pub handler---------------------")
-                    print(self.TYPECODE_TO_TYPE[info['typecode']])
-                    print(info['typecode'])
-                    print(self.TYPECODE_TO_TYPE[info['typecode']](fields))
-                    print(fields)
-                    print(field, i)
-                    print("-----------po pub handler--------------------\n")
+                def ros_pub_handler(fields, read_topic=read_topic, info=info, field=field): 
                     return \
                     read_topic.publish(
                         self.TYPECODE_TO_TYPE[info['typecode']](fields))
@@ -229,9 +216,6 @@ class RubiController(Plugin):
                 builder.build_field(
                     wid, field, info['typecode'], ros_pub_handler, info['out'], info['subfields'])
 
-            print("--------------jaki pub handler---------------")
-            print(ros_pub_handler)
-            print("-------------no taki-------------------------\n")
 
             if info['out']:
                 print(write_handler, info['out'])
