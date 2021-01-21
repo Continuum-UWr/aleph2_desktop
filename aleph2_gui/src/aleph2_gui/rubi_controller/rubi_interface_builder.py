@@ -284,11 +284,8 @@ class RubiInterfaceBuilder:
             assert(0)
 
         if read:
-            def handler(): return read_handler(
-                [get_value_handler() for (_, get_value_handler) in [read_stuff]])
-            for connect_read_handler, _ in [read_stuff]:
-                connect_read_handler(handler)
-
+            (connect_read_handler, value_handler) = read_stuff
+            connect_read_handler(lambda : read_handler([value_handler()]))
         self.vertical_cursor += self.VERTICAL_HALFSTEP
 
         if write:
