@@ -7,6 +7,7 @@
 #include <functional>
 
 #include <cctype>
+#include <ros/ros.h>
 
 #include "joystick.h"
 #include "rostalker.h"
@@ -20,12 +21,18 @@ void JoystickManager::Init() {
     gethostname(hostname, HOST_NAME_MAX);
 }
 
+//evices[event.jdevice.which]
+
 void JoystickManager::Update() {
     SDL_Event event;
 
     while(SDL_PollEvent(&event)) {
         int dev_id = event.jdevice.which;
-    
+        if(devices.find(dev_id) == devices.end() && event.type != SDL_JOYDEVICEADDED) {
+            ROS_INFO("operation on lost device");
+            continue;
+        }        
+
         switch(event.type) {
             case SDL_JOYAXISMOTION: {
                 float axis_value =  (float)event.jaxis.value /
@@ -37,17 +44,17 @@ void JoystickManager::Update() {
                 } else
                 axis_value = 0.0f;
                 
-                devices[event.jdevice.which]->axes[event.jaxis.axis] = axis_value;
+                devices[dev_id]->axes[event.jaxis.axis] = axis_value;
                 break;
             }
                 
             case SDL_JOYBUTTONDOWN:
-                devices[event.jdevice.which]->buttons[event.jbutton.button] = true;
-                devices[event.jdevice.which]->presses.push_back(event.jbutton.button);
+                devices[dev_id]->buttons[event.jbutton.button] = true;
+                devices[dev_id]->presses.push_back(event.jbutton.button);
                 break;
             case SDL_JOYBUTTONUP:
-                devices[event.jdevice.which]->buttons[event.jbutton.button] = false;
-                devices[event.jdevice.which]->releases.push_back(event.jbutton.button);
+                devices[dev_id]->buttons[event.jbutton.button] = false;
+                devices[dev_id]->releases.push_back(event.jbutton.button);
                 break;
                 
             case SDL_JOYHATMOTION: {
@@ -57,23 +64,23 @@ void JoystickManager::Update() {
                     devices[dev_id]->buttons[i] = false;
                 
                 if ( event.jhat.value & SDL_HAT_UP ) {
-                    devices[event.jdevice.which]->buttons[hat_position + 0] = true;
-                    devices[event.jdevice.which]->presses.push_back(hat_position + 0);
+                    devices[dev_id]->buttons[hat_position + 0] = true;
+                    devices[dev_id]->presses.push_back(hat_position + 0);
                 }
 
                 if ( event.jhat.value & SDL_HAT_DOWN ) {
-                    devices[event.jdevice.which]->buttons[hat_position + 1] = true;
-                    devices[event.jdevice.which]->presses.push_back(hat_position + 1);
+                    devices[dev_id]->buttons[hat_position + 1] = true;
+                    devices[dev_id]->presses.push_back(hat_position + 1);
                 }
 
                 if ( event.jhat.value & SDL_HAT_LEFT ) {
-                    devices[event.jdevice.which]->buttons[hat_position + 2] = true;
-                    devices[event.jdevice.which]->presses.push_back(hat_position + 2);
+                    devices[dev_id]->buttons[hat_position + 2] = true;
+                    devices[dev_id]->presses.push_back(hat_position + 2);
                 }
 
                 if ( event.jhat.value & SDL_HAT_RIGHT ) {
-                    devices[event.jdevice.which]->buttons[hat_position + 3] = true;
-                    devices[event.jdevice.which]->presses.push_back(hat_position + 3);
+                    devices[dev_id]->buttons[hat_position + 3] = true;
+                    devices[dev_id]->presses.push_back(hat_position + 3);
                 }
 
                 break;
@@ -114,13 +121,12 @@ void JoystickManager::NewDevice(int joy_id) {
     std::fill(state->axes.begin(), state->axes.end(), 0);
     std::fill(state->buttons.begin(), state->buttons.end(), 0);
 
-    if(inst_id == devices.size())
-        devices.resize(devices.size() + 1);
-
-    devices[inst_id] = state;
+    devices.insert({inst_id, state});
     RosTalker::Instance().RegisterDevice(state);
 }
 
 void JoystickManager::DeviceLost(int id) {
+    ROS_INFO("Removed devidce: %s", devices[id]->name.c_str());
     devices[id].reset();
+    devices.erase(id);
 }

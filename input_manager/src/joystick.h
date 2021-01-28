@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 class JoystickManager
 {
@@ -27,7 +28,7 @@ class JoystickManager
 
         void NewDevice(int id);
         void DeviceLost(int id);
-        std::vector<std::shared_ptr<DeviceState>> devices;
+        std::unordered_map<int, std::shared_ptr<DeviceState>> devices;
 
 };
 
