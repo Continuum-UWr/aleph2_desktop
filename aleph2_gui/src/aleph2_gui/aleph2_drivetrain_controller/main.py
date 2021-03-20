@@ -9,7 +9,7 @@ import dynamic_reconfigure.client
 
 from rqt_gui_py.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget
+from python_qt_binding.QtWidgets import QWidget, QListWidget
 from python_qt_binding.QtCore import pyqtSlot, pyqtSignal
 
 from std_msgs.msg import Bool, Float32
@@ -123,7 +123,7 @@ class Aleph2DrivetrainController(Plugin):
             self.usage_callback
         )
 
-        self.selector = JoystickSelector(self.input_callback)
+        self.selector = JoystickSelector(self.input_callback, self.InputPanel("ControllersList"))
         self.steerer = SteeringModule()
 
         self.refresh_signal.emit()
@@ -252,16 +252,11 @@ class Aleph2DrivetrainController(Plugin):
             self.refresh_signal.emit()
         return ConfigCallback
 
-    @pyqtSlot()
-    def BTNControllerClicked(self):
-        self.InputPanel("BTNController").setText(self.selector.Switch())
-
     def setup_signals(self):
         self.refresh_signal.connect(self.slot_refresh_gui)
         self.odom_refresh_signal.connect(self.slot_refresh_odom)
 
-        self.InputPanel("BTNController").clicked.connect(
-            self.BTNControllerClicked)
+
         self.InputPanel("ISENSITIVITY").valueChanged.connect(self.ISensChanged)
         self.InputPanel("CBACTIVE").toggled.connect(self.CBACTIVEToggled)
         self.InputPanel("CBMUX").toggled.connect(self.CBMUXToggled)

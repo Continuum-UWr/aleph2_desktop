@@ -310,11 +310,7 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
            </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="BTNController">
-            <property name="text">
-             <string>&lt;None&gt;</string>
-            </property>
-           </widget>
+           <widget class="QListWidget" name="ControllersList"/>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -867,7 +863,7 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
   </layout>
  </widget>
  <resources>
-  <include location="ta.qrc"/>
+  <include location="../ta.qrc"/>
  </resources>
  <connections>
   <connection>

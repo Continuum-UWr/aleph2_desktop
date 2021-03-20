@@ -67,12 +67,14 @@ void RosTalker::Update()
 }
 
 
-void RosTalker::PublishDevices() {
+void RosTalker::PublishDevices(bool shutdown) {
     input_msgs::DevicesListMessage msg;
     
 	msg.node_name = n_name;
-    for (auto dev : topics) {
-        msg.devices_list.push_back(std::get<1>(dev).lock()->name);
+    if(!shutdown) {
+        for (auto dev : topics) {
+            msg.devices_list.push_back(std::get<1>(dev).lock()->name);
+        }
     }
 
 	//msg.devices_list = devs;

@@ -34,7 +34,7 @@ class RosTalker
         void Init(int argc, char ** argv);
         void RegisterDevice(std::weak_ptr<DeviceState> dev);
         void Update();
-        void PublishDevices();
+        void PublishDevices(bool shutdown=false);
         RosTalker(RosTalker const&)      = delete;
         void operator=(RosTalker const&) = delete;
 
