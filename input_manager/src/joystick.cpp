@@ -22,6 +22,17 @@ void JoystickManager::Init() {
 }
 
 //evices[event.jdevice.which]
+float AxisValue(float value) {
+    float axis_value =  value / (value < 0 ? 32768.0f : 32767.0f);
+
+    if(std::abs(axis_value) > DEADZONE) {
+        axis_value -= (std::signbit(axis_value) ? -1.0f : 1.0f) * DEADZONE;
+        axis_value /= (1.0f - DEADZONE);
+    } else
+        axis_value = 0.0f;
+    return axis_value;
+}
+
 
 void JoystickManager::Update() {
     SDL_Event event;
@@ -34,17 +45,8 @@ void JoystickManager::Update() {
         }        
 
         switch(event.type) {
-            case SDL_JOYAXISMOTION: {
-                float axis_value =  (float)event.jaxis.value /
-                (event.jaxis.value < 0 ? 32768.0f : 32767.0f);
-
-                if(std::abs(axis_value) > DEADZONE) {
-                    axis_value -= (std::signbit(axis_value) ? -1.0f : 1.0f) * DEADZONE;
-                    axis_value /= (1.0f - DEADZONE);
-                } else
-                axis_value = 0.0f;
-                
-                devices[dev_id]->axes[event.jaxis.axis] = axis_value;
+            case SDL_JOYAXISMOTION: {               
+                devices[dev_id]->axes[event.jaxis.axis] = AxisValue(event.jaxis.value);
                 break;
             }
                 
@@ -118,8 +120,15 @@ void JoystickManager::NewDevice(int joy_id) {
             return !( isalnum(x) || x == '_' );
         }, '_');
 
-    std::fill(state->axes.begin(), state->axes.end(), 0);
-    std::fill(state->buttons.begin(), state->buttons.end(), 0);
+    for(int i = 0; i < state->buttons_c; i++) {
+        state->buttons[i] = SDL_JoystickGetButton(dev, i);
+    }
+    for(unsigned int i = 0; i < state->axes.size(); i++) {
+        state->axes[i] = AxisValue(SDL_JoystickGetAxis(dev, i));
+    }
+
+    //std::fill(state->axes.begin(), state->axes.end(), 0);
+    //std::fill(state->buttons.begin(), state->buttons.end(), 0);
 
     devices.insert({inst_id, state});
     RosTalker::Instance().RegisterDevice(state);
