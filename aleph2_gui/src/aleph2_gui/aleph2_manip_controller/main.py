@@ -9,7 +9,7 @@ from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
 
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtGui import *
 
 import aleph2_gui.resources.ta
@@ -51,23 +51,22 @@ class Aleph2ManipController(Plugin):
 
         self.effortController = EffortController()
 
-        self.selector = JoystickSelector(self.input_callback)
+        self.selector = JoystickSelector(self.input_callback, self.InputPanel("ControllersList"))
+        self.selector.controllerChanged.connect(self.ResetSensitivity)
 
-        self.InputPanel("BTNController").clicked.connect(
-            self.BTNControllerClicked)
         self.InputPanel("SBSENS").valueChanged.connect(
             self.SensitivityChanged)
         self.SensitivityChanged()
+
+    @pyqtSlot()
+    def ResetSensitivity(self):
+        self.InputPanel("SBSENS").setValue(0)
 
     @pyqtSlot()
     def SensitivityChanged(self):
         self.sensitivity = self.InputPanel("SBSENS").value()
         self.sensitivity_value = math.pow(
             self.SENSITIVITY_STEP, self.sensitivity)
-
-    @pyqtSlot()
-    def BTNControllerClicked(self):
-        self.InputPanel("BTNController").setText(self.selector.Switch())
 
     def input_callback(self, data):  # noqa
         axes = []
@@ -138,18 +137,21 @@ class EffortController:
         axes[2] = (axes[2]+1)/2
         axes[5] = -(axes[5]+1)/2
 
-        for axisName in self.JOINT_AXES:
-            mult = sens_mult*self.BASE_MULTPLIER*self.MULTPLIER[axisName]
-            value = sum([axes[i] for i in self.JOINT_AXES[axisName]])
+        try:
+            for axisName in self.JOINT_AXES:
+                mult = sens_mult*self.BASE_MULTPLIER*self.MULTPLIER[axisName]
+                value = sum([axes[i] for i in self.JOINT_AXES[axisName]])
 
-            value = mult * value
-            self.pubs[axisName].publish(Float64(value))
+                value = mult * value
+                self.pubs[axisName].publish(Float64(value))
 
-        for axisName in self.JOINT_KEYS:
-            mult = sens_mult*self.BASE_MULTPLIER*self.MULTPLIER[axisName]
-            value = 1*sum([data.buttons[i] for i in self.JOINT_KEYS[axisName][0]]) + \
-                -1*sum([data.buttons[i] for i in self.JOINT_KEYS[axisName][1]])
+            for axisName in self.JOINT_KEYS:
+                mult = sens_mult*self.BASE_MULTPLIER*self.MULTPLIER[axisName]
+                value = 1*sum([data.buttons[i] for i in self.JOINT_KEYS[axisName][0]]) + \
+                    -1*sum([data.buttons[i] for i in self.JOINT_KEYS[axisName][1]])
 
-            value = mult * value
-            print(value)
-            self.pubs[axisName].publish(Float64(value))
+                value = mult * value
+                #print(value)
+                self.pubs[axisName].publish(Float64(value))
+        except IndexError as e:
+            rospy.logerr_throttle(3, "Pad jest zbyt biedny w przyciski | manip_controller")

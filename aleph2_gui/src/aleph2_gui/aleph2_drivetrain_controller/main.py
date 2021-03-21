@@ -9,7 +9,7 @@ import dynamic_reconfigure.client
 
 from rqt_gui_py.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget
+from python_qt_binding.QtWidgets import QWidget, QListWidget
 from python_qt_binding.QtCore import pyqtSlot, pyqtSignal
 
 from std_msgs.msg import Bool, Float32
@@ -123,7 +123,8 @@ class Aleph2DrivetrainController(Plugin):
             self.usage_callback
         )
 
-        self.selector = JoystickSelector(self.input_callback)
+        self.selector = JoystickSelector(self.input_callback, self.InputPanel("ControllersList"))
+        self.selector.controllerChanged.connect(self.ResetSensitivity)
         self.steerer = SteeringModule()
 
         self.refresh_signal.emit()
@@ -154,6 +155,10 @@ class Aleph2DrivetrainController(Plugin):
     def ISensChanged(self, value):
         self.sensitivity = 1.33 ** value
         self.sensitivity_level = value
+
+    @pyqtSlot()
+    def ResetSensitivity(self):
+        self.InputPanel("ISENSITIVITY").setValue(0)
 
     @pyqtSlot(bool)
     def CBACTIVEToggled(self, checked):
@@ -252,16 +257,11 @@ class Aleph2DrivetrainController(Plugin):
             self.refresh_signal.emit()
         return ConfigCallback
 
-    @pyqtSlot()
-    def BTNControllerClicked(self):
-        self.InputPanel("BTNController").setText(self.selector.Switch())
-
     def setup_signals(self):
         self.refresh_signal.connect(self.slot_refresh_gui)
         self.odom_refresh_signal.connect(self.slot_refresh_odom)
 
-        self.InputPanel("BTNController").clicked.connect(
-            self.BTNControllerClicked)
+
         self.InputPanel("ISENSITIVITY").valueChanged.connect(self.ISensChanged)
         self.InputPanel("CBACTIVE").toggled.connect(self.CBACTIVEToggled)
         self.InputPanel("CBMUX").toggled.connect(self.CBMUXToggled)
@@ -278,25 +278,27 @@ class Aleph2DrivetrainController(Plugin):
             self.PowerPanel("BBR").toggled.connect(self.BRConfigChanged)
 
     def input_callback(self, data):
+        try:
+            for i in data.buttons_pressed:
+                if i == self.BTN_SENS_UP and self.sensitivity_level < 5:
+                    self.sensitivity_level += 1
+                if i == self.BTN_SENS_DOWN and self.sensitivity_level > -5:
+                    self.sensitivity_level -= 1
 
-        for i in data.buttons_pressed:
-            if i == self.BTN_SENS_UP and self.sensitivity_level < 5:
-                self.sensitivity_level += 1
-            if i == self.BTN_SENS_DOWN and self.sensitivity_level > -5:
-                self.sensitivity_level -= 1
+                if i == self.BTN_PWR_ON:
+                    self.power = [True] * 4
+                if i == self.BTN_PWR_OFF:
+                    self.power = [False] * 4
 
-            if i == self.BTN_PWR_ON:
-                self.power = [True] * 4
-            if i == self.BTN_PWR_OFF:
-                self.power = [False] * 4
+                if i == self.BTN_BRK_ON:
+                    self.brake = [True] * 4
 
-            if i == self.BTN_BRK_ON:
-                self.brake = [True] * 4
+                if i == self.BTN_BRK_OFF:
+                    self.brake = [False] * 4
 
-            if i == self.BTN_BRK_OFF:
-                self.brake = [False] * 4
-
-        self.input_temp_active = data.buttons[self.BTN_TEMP_ACTIVE]
+            self.input_temp_active = data.buttons[self.BTN_TEMP_ACTIVE]
+        except IndexError as e:
+            rospy.logerr_throttle(3, "Pad jest zbyt biedny w przyciski | drivetrain_controller")
 
         if len(data.buttons_pressed) > 0:
             self.refresh_signal.emit()
