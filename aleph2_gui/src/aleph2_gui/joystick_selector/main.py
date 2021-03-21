@@ -11,10 +11,11 @@ from python_qt_binding.QtGui import QColor
 class JoystickSelector(QObject):
     dupa_signal = pyqtSignal()
 
-    def __init__(self, callback, widget):
+    def __init__(self, callback, widget, signal):
         super(JoystickSelector, self).__init__()
         self.client_callback = callback
         self.widget = widget
+        self.signal = signal
         
         self.devices_dict = {}
         self.selected_dev = "<None>"
@@ -26,7 +27,8 @@ class JoystickSelector(QObject):
         rate = rospy.Rate(30)
         
         self.build_list(self.devices)
-        self.widget.item(0).setBackground(QColor("#ffffff"))
+        #self.widget.item(0).setBackground(QColor("blue"))
+        self.widget.item(0).setSelected(True)
 
     def devices_callback(self, data):
         name = data.node_name
@@ -40,6 +42,7 @@ class JoystickSelector(QObject):
             self.sub_input.unregister()
             self.sub_input = 0
             self.selected_dev = "<None>"
+            self.signal.emit()
 
 
         self.build_list(self.devices)
@@ -47,8 +50,9 @@ class JoystickSelector(QObject):
     def build_list(self, devices):
         self.widget.clear()
         self.widget.addItems(devices)
-        for i in range(self.widget.count()):
-            self.widget.item(i).setForeground(QColor("#ffffff"))#QColor("white")
+        self.widget.item(0).setSelected(True)
+        #for i in range(self.widget.count()):
+        #    self.widget.item(i).setForeground(QColor("#ffffff"))#QColor("white")
             #self.widget.item(i).setSelected(True)          
 
     @pyqtSlot()
@@ -69,6 +73,7 @@ class JoystickSelector(QObject):
             self.sub_input = 0
 
         self.selected_dev = self.widget.currentItem().text()
+        self.signal.emit()
         for k in self.devices_dict.keys():
             if self.selected_dev in self.devices_dict[k]:
                 self.sub_input = rospy.Subscriber("/" + k + "/" + self.selected_dev, InputMessage, self.client_callback)

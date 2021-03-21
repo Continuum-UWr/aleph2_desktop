@@ -23,6 +23,7 @@ from .steering_module import SteeringModule
 class Aleph2DrivetrainController(Plugin):
     refresh_signal = pyqtSignal()
     odom_refresh_signal = pyqtSignal()
+    controller_change_signal = pyqtSignal()
 
     DRIVER_TIMEOUT = 1.0  # sec
 
@@ -123,7 +124,8 @@ class Aleph2DrivetrainController(Plugin):
             self.usage_callback
         )
 
-        self.selector = JoystickSelector(self.input_callback, self.InputPanel("ControllersList"))
+        self.controller_change_signal.connect(self.ResetSensitivity)
+        self.selector = JoystickSelector(self.input_callback, self.InputPanel("ControllersList"), self.controller_change_signal)
         self.steerer = SteeringModule()
 
         self.refresh_signal.emit()
@@ -154,6 +156,10 @@ class Aleph2DrivetrainController(Plugin):
     def ISensChanged(self, value):
         self.sensitivity = 1.33 ** value
         self.sensitivity_level = value
+
+    @pyqtSlot()
+    def ResetSensitivity(self):
+        self.InputPanel("ISENSITIVITY").setValue(0)
 
     @pyqtSlot(bool)
     def CBACTIVEToggled(self, checked):
