@@ -18,7 +18,7 @@ struct DeviceState{
     std::vector<uint8_t> buttons;
     std::vector<int> presses;
     std::vector<int> releases;
-
+    bool active;
     int buttons_c;
 };
 

@@ -156,9 +156,18 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_16">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_11">
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <property name="spacing">
+        <number>6</number>
+       </property>
        <item>
         <widget class="QGroupBox" name="PDRIVER">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="title">
           <string>DRIVER</string>
          </property>
@@ -215,6 +224,12 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
        </item>
        <item>
         <widget class="QGroupBox" name="PIN">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="title">
           <string> INPUT</string>
          </property>
@@ -351,19 +366,6 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
           </item>
          </layout>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </item>

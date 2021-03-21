@@ -9,59 +9,61 @@ from python_qt_binding.QtGui import QColor
 #from python_qt_binding.QtWidgets import QWidget
 
 class JoystickSelector(QObject):
-    dupa_signal = pyqtSignal()
+    controllerChanged = pyqtSignal()
+    devicesUpdated = pyqtSignal()
 
-    def __init__(self, callback, widget, signal):
+    def __init__(self, callback, widget):
         super(JoystickSelector, self).__init__()
         self.client_callback = callback
         self.widget = widget
-        self.signal = signal
         
         self.devices_dict = {}
         self.selected_dev = "<None>"
         self.devices = ["<None>"]
+        self.active_dict = {}
+        self.active = [False]
         
         self.sub_input = 0
         self.widget.itemClicked.connect(self.device_selected)
+        self.devicesUpdated.connect(self.build_list)
+        self.controllerChanged.connect(self.build_list)
         self.devices_sub = rospy.Subscriber("/input/devices_list", DevicesListMessage, self.devices_callback)
-        rate = rospy.Rate(30)
         
-        self.build_list(self.devices)
-        #self.widget.item(0).setBackground(QColor("blue"))
-        self.widget.item(0).setSelected(True)
+        self.devicesUpdated.emit()
 
     def devices_callback(self, data):
         name = data.node_name
-        devs = data.devices_list
-        self.devices_dict[name] = devs
+        self.devices_dict[name] = data.devices_list
         self.devices = ["<None>"]
-        for name, dev_list in self.devices_dict.items():
-            self.devices += dev_list
+        self.active_dict[name] = data.active
+        self.active = [False]
+
+        for k in self.devices_dict.keys():
+            self.devices += self.devices_dict[k]
+            self.active += self.active_dict[k]
+
 
         if self.selected_dev not in self.devices:
             self.sub_input.unregister()
             self.sub_input = 0
             self.selected_dev = "<None>"
-            self.signal.emit()
+            self.controllerChanged.emit()
 
+        self.devicesUpdated.emit()
 
-        self.build_list(self.devices)
-
-    def build_list(self, devices):
+    @pyqtSlot()
+    def build_list(self):
         self.widget.clear()
-        self.widget.addItems(devices)
-        self.widget.item(0).setSelected(True)
-        #for i in range(self.widget.count()):
-        #    self.widget.item(i).setForeground(QColor("#ffffff"))#QColor("white")
-            #self.widget.item(i).setSelected(True)          
+        self.widget.addItems(self.devices)      
+        for i in range(len(self.active)):
+            if self.widget.item(i).text() == self.selected_dev:
+                self.widget.item(i).setBackground(QColor("#3a3a99"))#niebieski
+                continue
 
-    @pyqtSlot()
-    def dupa(self):
-        self.widget.setText("<None>")
-
-    @pyqtSlot()
-    def help(self):
-        self.widget.setText(self.Switch()) 
+            if self.active[i]:
+                self.widget.item(i).setBackground(QColor("#bf2626"))#czerowny
+            else:
+                self.widget.item(i).setBackground(QColor(0,0,0,0))#czarny
 
     @pyqtSlot()
     def device_selected(self):        
@@ -73,16 +75,16 @@ class JoystickSelector(QObject):
             self.sub_input = 0
 
         self.selected_dev = self.widget.currentItem().text()
-        self.signal.emit()
+        self.controllerChanged.emit()
         for k in self.devices_dict.keys():
             if self.selected_dev in self.devices_dict[k]:
                 self.sub_input = rospy.Subscriber("/" + k + "/" + self.selected_dev, InputMessage, self.client_callback)
-                #print("/" + k + "/" + self.selected_dev)
+                
                 break
 
     def shutdown(self):
         if self.sub_input != 0:
             self.sub_input.unregister()
         self.widget.clear()
-        #self.devices_sub.unregister()
+        self.devices_sub.unregister()
         

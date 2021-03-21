@@ -23,7 +23,6 @@ from .steering_module import SteeringModule
 class Aleph2DrivetrainController(Plugin):
     refresh_signal = pyqtSignal()
     odom_refresh_signal = pyqtSignal()
-    controller_change_signal = pyqtSignal()
 
     DRIVER_TIMEOUT = 1.0  # sec
 
@@ -124,8 +123,8 @@ class Aleph2DrivetrainController(Plugin):
             self.usage_callback
         )
 
-        self.controller_change_signal.connect(self.ResetSensitivity)
-        self.selector = JoystickSelector(self.input_callback, self.InputPanel("ControllersList"), self.controller_change_signal)
+        self.selector = JoystickSelector(self.input_callback, self.InputPanel("ControllersList"))
+        self.selector.controllerChanged.connect(self.ResetSensitivity)
         self.steerer = SteeringModule()
 
         self.refresh_signal.emit()
@@ -279,25 +278,27 @@ class Aleph2DrivetrainController(Plugin):
             self.PowerPanel("BBR").toggled.connect(self.BRConfigChanged)
 
     def input_callback(self, data):
+        try:
+            for i in data.buttons_pressed:
+                if i == self.BTN_SENS_UP and self.sensitivity_level < 5:
+                    self.sensitivity_level += 1
+                if i == self.BTN_SENS_DOWN and self.sensitivity_level > -5:
+                    self.sensitivity_level -= 1
 
-        for i in data.buttons_pressed:
-            if i == self.BTN_SENS_UP and self.sensitivity_level < 5:
-                self.sensitivity_level += 1
-            if i == self.BTN_SENS_DOWN and self.sensitivity_level > -5:
-                self.sensitivity_level -= 1
+                if i == self.BTN_PWR_ON:
+                    self.power = [True] * 4
+                if i == self.BTN_PWR_OFF:
+                    self.power = [False] * 4
 
-            if i == self.BTN_PWR_ON:
-                self.power = [True] * 4
-            if i == self.BTN_PWR_OFF:
-                self.power = [False] * 4
+                if i == self.BTN_BRK_ON:
+                    self.brake = [True] * 4
 
-            if i == self.BTN_BRK_ON:
-                self.brake = [True] * 4
+                if i == self.BTN_BRK_OFF:
+                    self.brake = [False] * 4
 
-            if i == self.BTN_BRK_OFF:
-                self.brake = [False] * 4
-
-        self.input_temp_active = data.buttons[self.BTN_TEMP_ACTIVE]
+            self.input_temp_active = data.buttons[self.BTN_TEMP_ACTIVE]
+        except IndexError as e:
+            rospy.logerr_throttle(3, "Pad jest zbyt biedny w przyciski | drivetrain_controller")
 
         if len(data.buttons_pressed) > 0:
             self.refresh_signal.emit()

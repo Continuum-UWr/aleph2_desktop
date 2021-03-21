@@ -45,8 +45,13 @@ void RosTalker::Update()
                                         send = true;
                                         return true;
                                     }
-
+                                    bool t = std::get<0>(entry).getNumSubscribers() > 0;
                                     auto device = std::get<1>(entry).lock();
+                                    if(t != device->active) {
+                                        device->active = t;
+                                        send = true;
+                                    }
+
                                     input_msgs::InputMessage msg;
 
                                     msg.axes = device->axes;
@@ -73,7 +78,9 @@ void RosTalker::PublishDevices(bool shutdown) {
 	msg.node_name = n_name;
     if(!shutdown) {
         for (auto dev : topics) {
-            msg.devices_list.push_back(std::get<1>(dev).lock()->name);
+            auto device = std::get<1>(dev).lock();
+            msg.devices_list.push_back(device->name);
+            msg.active.push_back(device->active);
         }
     }
 
