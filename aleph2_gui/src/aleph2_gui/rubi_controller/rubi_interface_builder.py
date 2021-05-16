@@ -38,11 +38,11 @@ class RubiInterfaceBuilder:
     HORIZONTAL_DOUBLEMARGINS = 15
 
     INT_RANGES = {
-        #int type: (min, max)
-        TYPECODE_int32_t: (-2147483648, 2147483647), 
+        # int type: (min, max)
+        TYPECODE_int32_t: (-2147483648, 2147483647),
         TYPECODE_int16_t: (-32768, 32767),
         TYPECODE_int8_t: (-128, 127),
-        TYPECODE_uint32_t: (0, 4294967295), 
+        TYPECODE_uint32_t: (0, 4294967295),
         TYPECODE_uint16_t: (0, 65535),
         TYPECODE_uint8_t: (0, 255)
     }
@@ -89,7 +89,8 @@ class RubiInterfaceBuilder:
             ret.setObjectName(self.make_name())
             ret.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             ret.setKeyboardTracking(False)
-            ret.setRange(self.INT_RANGES[typecode][0], self.INT_RANGES[typecode][1])
+            ret.setRange(self.INT_RANGES[typecode]
+                         [0], self.INT_RANGES[typecode][1])
             ret.setVisible(True)
 
             def connect_read_handler(handler):
@@ -113,17 +114,17 @@ class RubiInterfaceBuilder:
     def build_bool_widget(self, container, typecode, read, write):
         ret = QCheckBox(container)
         ret.setObjectName(self.make_name())
-        
+
         if read:
             ret.setCheckable(True)
-            ret.setEnabled(True)  
+            ret.setEnabled(True)
             ret.setVisible(True)
 
             def connect_read_handler(handler):
                 return ret.stateChanged.connect(handler)
 
             def get_value_handler():
-                return ret.checkState();
+                return ret.checkState()
 
             if write:
                 return (ret, (connect_read_handler, get_value_handler), self.write_handler_bool)
@@ -144,7 +145,6 @@ class RubiInterfaceBuilder:
             ret.setRange(-2**self.FLOAT_EXP, 2**self.FLOAT_EXP-1)
             ret.setDecimals(self.FLOAT_PREC)
             ret.setSingleStep(self.FLOAT_STEP)
-            
 
             def connect_read_handler(handler):
                 return ret.valueChanged.connect(handler)
@@ -187,8 +187,9 @@ class RubiInterfaceBuilder:
     def write_handler_float_label(self, widgets, datas):
         for widget, data in zip(widgets, datas):
             rndData = round(data, self.FLOAT_PREC+1)
-            widget.setText("{value:.{prec}f}".format(value=rndData,prec=self.FLOAT_PREC))
-    
+            widget.setText("{value:.{prec}f}".format(
+                value=rndData, prec=self.FLOAT_PREC))
+
     def write_handler_float_spinbox(self, widgets, datas):
         for widget, data in zip(widgets, datas):
             widget.setValue(data)
@@ -285,7 +286,7 @@ class RubiInterfaceBuilder:
 
         if read:
             (connect_read_handler, value_handler) = read_stuff
-            connect_read_handler(lambda : read_handler([value_handler()]))
+            connect_read_handler(lambda: read_handler([value_handler()]))
         self.vertical_cursor += self.VERTICAL_HALFSTEP
 
         if write:
