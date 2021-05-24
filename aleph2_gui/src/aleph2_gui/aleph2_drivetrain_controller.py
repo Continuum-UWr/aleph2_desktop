@@ -12,12 +12,38 @@ from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QListWidget
 from python_qt_binding.QtCore import pyqtSlot, pyqtSignal
 
+from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool, Float32
 from nav_msgs.msg import Odometry
 
 import aleph2_gui.resources.ta
 from aleph2_gui.joystick_selector import JoystickSelector
-from .steering_module import SteeringModule
+
+
+class SteeringModule:
+    AXIS_LINEAR = 1
+    AXIS_ANGULAR = 3
+
+    def __init__(self):
+        self.pub_cmd = rospy.Publisher('aleph2/cmd_vel', Twist, queue_size=10)
+        self.pub_mux = rospy.Publisher('joy_vel', Twist, queue_size=10)
+        self.mux_mode = False
+
+    def Update(self, axes):
+
+        steer_analog = Twist()
+
+        steer_analog.linear.x = axes[self.AXIS_LINEAR] / -0.9
+        steer_analog.angular.z = axes[self.AXIS_ANGULAR] / -0.45
+
+        if self.mux_mode:
+            self.pub_mux.publish(steer_analog)
+        else:
+            self.pub_cmd.publish(steer_analog)
+
+    def shutdown(self):
+        self.pub_cmd.unregister()
+        self.pub_mux.unregister()
 
 
 class Aleph2DrivetrainController(Plugin):
@@ -123,7 +149,8 @@ class Aleph2DrivetrainController(Plugin):
             self.usage_callback
         )
 
-        self.selector = JoystickSelector(self.input_callback, self.InputPanel("ControllersList"))
+        self.selector = JoystickSelector(
+            self.input_callback, self.InputPanel("ControllersList"))
         self.selector.controllerChanged.connect(self.ResetSensitivity)
         self.steerer = SteeringModule()
 
@@ -261,7 +288,6 @@ class Aleph2DrivetrainController(Plugin):
         self.refresh_signal.connect(self.slot_refresh_gui)
         self.odom_refresh_signal.connect(self.slot_refresh_odom)
 
-
         self.InputPanel("ISENSITIVITY").valueChanged.connect(self.ISensChanged)
         self.InputPanel("CBACTIVE").toggled.connect(self.CBACTIVEToggled)
         self.InputPanel("CBMUX").toggled.connect(self.CBMUXToggled)
@@ -298,7 +324,8 @@ class Aleph2DrivetrainController(Plugin):
 
             self.input_temp_active = data.buttons[self.BTN_TEMP_ACTIVE]
         except IndexError as e:
-            rospy.logerr_throttle(3, "Pad jest zbyt biedny w przyciski | drivetrain_controller")
+            rospy.logerr_throttle(
+                3, "Pad jest zbyt biedny w przyciski | drivetrain_controller")
 
         if len(data.buttons_pressed) > 0:
             self.refresh_signal.emit()

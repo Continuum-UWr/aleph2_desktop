@@ -130,7 +130,7 @@ class EffortController:
         self.pubs = {}
         for name in self.JOINT_NAMES:
             self.pubs[name] = rospy.Publisher(
-                "/aleph2/manip/controllers/effort/{}/command".format(name), Float64, queue_size=1)
+                "aleph2/manip/controllers/effort/{}/command".format(name), Float64, queue_size=1)
 
     def input_callback(self, data, sens_mult):
         axes = list(data.axes)
