@@ -12,6 +12,8 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>pyqt5-dev-tools</build_depend>
+
   <exec_depend>rospy</exec_depend>
 
   <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-rospkg</exec_depend>
