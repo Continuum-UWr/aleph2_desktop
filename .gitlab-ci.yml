@@ -1,0 +1,9 @@
+stages:
+- valid
+
+black:
+  stage: valid
+  image: gitlab.continuum.ii.uni.wroc.pl:5000/continuum/random/images/python
+  script:
+    - black . --check --extend-exclude "aleph2_gui/src/aleph2_gui/resources" --diff
+
