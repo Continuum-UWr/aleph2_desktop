@@ -2,7 +2,14 @@ import sys
 from functools import partial
 
 from python_qt_binding.QtWidgets import (
-    QWidget, QCheckBox, QLabel, QPushButton, QSpinBox, QDoubleSpinBox, QTextEdit)
+    QWidget,
+    QCheckBox,
+    QLabel,
+    QPushButton,
+    QSpinBox,
+    QDoubleSpinBox,
+    QTextEdit,
+)
 
 from python_qt_binding.QtCore import *
 from python_qt_binding.QtGui import QPixmap
@@ -44,7 +51,7 @@ class RubiInterfaceBuilder:
         TYPECODE_int8_t: (-128, 127),
         TYPECODE_uint32_t: (0, 4294967295),
         TYPECODE_uint16_t: (0, 65535),
-        TYPECODE_uint8_t: (0, 255)
+        TYPECODE_uint8_t: (0, 255),
     }
 
     GEOMETRY = {
@@ -64,7 +71,7 @@ class RubiInterfaceBuilder:
         (TYPECODE_bool_t, False): (0, 36, 8, 0),
         (TYPECODE_bool_t, True): (0, 36, 8, 0),
         (TYPECODE_float, False): (0, 41, 8, 0),
-        (TYPECODE_float, True): (0, 24, 8, 8)
+        (TYPECODE_float, True): (0, 24, 8, 8),
     }
 
     def __init__(self):
@@ -77,7 +84,7 @@ class RubiInterfaceBuilder:
             self.TYPECODE_uint16_t: self.build_int_widget,
             self.TYPECODE_uint8_t: self.build_int_widget,
             self.TYPECODE_bool_t: self.build_bool_widget,
-            self.TYPECODE_float: self.build_float_widget
+            self.TYPECODE_float: self.build_float_widget,
         }
 
         self.vertical_cursor = 5
@@ -89,8 +96,7 @@ class RubiInterfaceBuilder:
             ret.setObjectName(self.make_name())
             ret.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             ret.setKeyboardTracking(False)
-            ret.setRange(self.INT_RANGES[typecode]
-                         [0], self.INT_RANGES[typecode][1])
+            ret.setRange(self.INT_RANGES[typecode][0], self.INT_RANGES[typecode][1])
             ret.setVisible(True)
 
             def connect_read_handler(handler):
@@ -100,13 +106,17 @@ class RubiInterfaceBuilder:
                 return ret.value()
 
             if write:
-                return (ret, (connect_read_handler, get_value_handler), self.write_handler_int_spinbox)
+                return (
+                    ret,
+                    (connect_read_handler, get_value_handler),
+                    self.write_handler_int_spinbox,
+                )
             else:
                 return (ret, (connect_read_handler, get_value_handler), None)
         else:
             ret = QLabel(container)
             ret.setObjectName(self.make_name())
-            ret.setText('out')
+            ret.setText("out")
             ret.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             ret.setVisible(True)
             return (ret, None, self.write_handler_int_label)
@@ -127,7 +137,11 @@ class RubiInterfaceBuilder:
                 return ret.checkState()
 
             if write:
-                return (ret, (connect_read_handler, get_value_handler), self.write_handler_bool)
+                return (
+                    ret,
+                    (connect_read_handler, get_value_handler),
+                    self.write_handler_bool,
+                )
             else:
                 return (ret, (connect_read_handler, get_value_handler), None)
         else:
@@ -142,7 +156,7 @@ class RubiInterfaceBuilder:
             ret.setObjectName(self.make_name())
             ret.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             ret.setKeyboardTracking(False)
-            ret.setRange(-2**self.FLOAT_EXP, 2**self.FLOAT_EXP-1)
+            ret.setRange(-(2 ** self.FLOAT_EXP), 2 ** self.FLOAT_EXP - 1)
             ret.setDecimals(self.FLOAT_PREC)
             ret.setSingleStep(self.FLOAT_STEP)
 
@@ -153,13 +167,17 @@ class RubiInterfaceBuilder:
                 return ret.value()
 
             if write:
-                return (ret, (connect_read_handler, get_value_handler), self.write_handler_float_spinbox)
+                return (
+                    ret,
+                    (connect_read_handler, get_value_handler),
+                    self.write_handler_float_spinbox,
+                )
             else:
                 return (ret, (connect_read_handler, get_value_handler), None)
         else:
             ret = QLabel(container)
             ret.setObjectName(self.make_name())
-            ret.setText('out')
+            ret.setText("out")
             ret.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             ret.setVisible(True)
             return (ret, None, self.write_handler_float_label)
@@ -186,9 +204,10 @@ class RubiInterfaceBuilder:
 
     def write_handler_float_label(self, widgets, datas):
         for widget, data in zip(widgets, datas):
-            rndData = round(data, self.FLOAT_PREC+1)
-            widget.setText("{value:.{prec}f}".format(
-                value=rndData, prec=self.FLOAT_PREC))
+            rndData = round(data, self.FLOAT_PREC + 1)
+            widget.setText(
+                "{value:.{prec}f}".format(value=rndData, prec=self.FLOAT_PREC)
+            )
 
     def write_handler_float_spinbox(self, widgets, datas):
         for widget, data in zip(widgets, datas):
@@ -196,9 +215,13 @@ class RubiInterfaceBuilder:
 
     def build_field(self, container, name, typecode, read_handler, write, subfields):
         if len(subfields) > 0:
-            return self.build_field_with_subfields(container, name, typecode, read_handler, write, subfields)
+            return self.build_field_with_subfields(
+                container, name, typecode, read_handler, write, subfields
+            )
         else:
-            return self.build_field_no_subfields(container, name, typecode, read_handler, write)
+            return self.build_field_no_subfields(
+                container, name, typecode, read_handler, write
+            )
 
     def make_label(self, container, x, dim, text):
         field_label = QLabel(container)
@@ -209,9 +232,10 @@ class RubiInterfaceBuilder:
         field_label.setText(text)
         field_label.setVisible(True)
 
-    def build_field_with_subfields(self, container, name, typecode, toplevel_read_handler, write, subfields):
-        self.make_label(container, self.TITLE_MARGIN,
-                        self.HORIZONTAL_SIZE, name)
+    def build_field_with_subfields(
+        self, container, name, typecode, toplevel_read_handler, write, subfields
+    ):
+        self.make_label(container, self.TITLE_MARGIN, self.HORIZONTAL_SIZE, name)
         self.vertical_cursor += self.VERTICAL_STEP
 
         widgets = []
@@ -222,33 +246,38 @@ class RubiInterfaceBuilder:
 
         for subfield in subfields:
             widget, read_stuff, write_handler = self.WIDGET_BUILDERS[typecode](
-                container, typecode, read, write)
+                container, typecode, read, write
+            )
 
-            columns, height, margin, step_boost = self.GEOMETRY[(
-                typecode, read)]
+            columns, height, margin, step_boost = self.GEOMETRY[(typecode, read)]
 
             self.vertical_cursor += step_boost
 
-            self.make_label(container, self.TITLE_MARGIN,
-                            self.HORIZONTAL_PIVOT, subfield)
+            self.make_label(
+                container, self.TITLE_MARGIN, self.HORIZONTAL_PIVOT, subfield
+            )
 
             if columns == 0:
-                widget.setFixedWidth(
-                    self.HORIZONTAL_SIZE - self.HORIZONTAL_PIVOT)
+                widget.setFixedWidth(self.HORIZONTAL_SIZE - self.HORIZONTAL_PIVOT)
                 widget.setFixedHeight(height)
-                widget.move(self.HORIZONTAL_PIVOT + margin,
-                            self.vertical_cursor + step_boost)
+                widget.move(
+                    self.HORIZONTAL_PIVOT + margin, self.vertical_cursor + step_boost
+                )
 
                 self.vertical_cursor += self.VERTICAL_STEP
             else:
-                assert(0)
+                assert 0
 
             widgets += [widget]
             read_stuffs += [read_stuff]
 
         if read:
-            def handler(): return toplevel_read_handler(
-                [get_value_handler() for (_, get_value_handler) in read_stuffs])
+
+            def handler():
+                return toplevel_read_handler(
+                    [get_value_handler() for (_, get_value_handler) in read_stuffs]
+                )
+
             for connect_read_handler, _ in read_stuffs:
                 connect_read_handler(handler)
 
@@ -264,25 +293,25 @@ class RubiInterfaceBuilder:
         read = read_handler is not None
 
         widget, read_stuff, write_handler = self.WIDGET_BUILDERS[typecode](
-            container, typecode, read, write)
+            container, typecode, read, write
+        )
 
         columns, height, margin, step_boost = self.GEOMETRY[(typecode, read)]
 
         self.vertical_cursor += step_boost
 
-        self.make_label(container, self.TITLE_MARGIN,
-                        self.HORIZONTAL_PIVOT, name)
+        self.make_label(container, self.TITLE_MARGIN, self.HORIZONTAL_PIVOT, name)
 
         if columns == 0:
-            widget.setFixedWidth(
-                self.HORIZONTAL_SIZE - self.HORIZONTAL_PIVOT)
+            widget.setFixedWidth(self.HORIZONTAL_SIZE - self.HORIZONTAL_PIVOT)
             widget.setFixedHeight(height)
-            widget.move(self.HORIZONTAL_PIVOT + margin,
-                        self.vertical_cursor + step_boost)
+            widget.move(
+                self.HORIZONTAL_PIVOT + margin, self.vertical_cursor + step_boost
+            )
 
             self.vertical_cursor += self.VERTICAL_STEP
         else:
-            assert(0)
+            assert 0
 
         if read:
             (connect_read_handler, value_handler) = read_stuff

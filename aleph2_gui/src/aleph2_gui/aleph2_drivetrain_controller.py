@@ -25,8 +25,8 @@ class SteeringModule:
     AXIS_ANGULAR = 3
 
     def __init__(self):
-        self.pub_cmd = rospy.Publisher('aleph2/cmd_vel', Twist, queue_size=10)
-        self.pub_mux = rospy.Publisher('joy_vel', Twist, queue_size=10)
+        self.pub_cmd = rospy.Publisher("aleph2/cmd_vel", Twist, queue_size=10)
+        self.pub_mux = rospy.Publisher("joy_vel", Twist, queue_size=10)
         self.mux_mode = False
 
     def Update(self, axes):
@@ -63,21 +63,22 @@ class Aleph2DrivetrainController(Plugin):
     def __init__(self, context):
         super(Aleph2DrivetrainController, self).__init__(context)
 
-        self.setObjectName('DrivetrainController')
+        self.setObjectName("DrivetrainController")
 
         self._widget = QWidget()
 
         ui_file = os.path.join(
             rospkg.RosPack().get_path("aleph2_gui"),
-            "resources/ui/aleph2_drivetrain_controller.ui"
+            "resources/ui/aleph2_drivetrain_controller.ui",
         )
 
         loadUi(ui_file, self._widget)
-        self._widget.setObjectName('DrivetrainUi')
+        self._widget.setObjectName("DrivetrainUi")
 
         if context.serial_number() > 1:
             self._widget.setWindowTitle(
-                self._widget.windowTitle() + (' (%d)' % context.serial_number()))
+                self._widget.windowTitle() + (" (%d)" % context.serial_number())
+            )
 
         context.add_widget(self._widget)
 
@@ -100,39 +101,36 @@ class Aleph2DrivetrainController(Plugin):
         self.last_update = time.time()
         self.driver_online = threading.Event()
 
-        self.pub_ign_planner = rospy.Publisher(
-            "ign_planner",
-            Bool,
-            queue_size=1
-        )
+        self.pub_ign_planner = rospy.Publisher("ign_planner", Bool, queue_size=1)
 
         try:
             self.FLConfigClient = dynamic_reconfigure.client.Client(
                 "aleph2/drivetrain/joints/wheel_FL_joint",
                 timeout=1,
-                config_callback=self.get_config_callback(0)
+                config_callback=self.get_config_callback(0),
             )
 
             self.BLConfigClient = dynamic_reconfigure.client.Client(
                 "aleph2/drivetrain/joints/wheel_RL_joint",
                 timeout=1,
-                config_callback=self.get_config_callback(1)
+                config_callback=self.get_config_callback(1),
             )
 
             self.FRConfigClient = dynamic_reconfigure.client.Client(
                 "aleph2/drivetrain/joints/wheel_FR_joint",
                 timeout=1,
-                config_callback=self.get_config_callback(2)
+                config_callback=self.get_config_callback(2),
             )
 
             self.BRConfigClient = dynamic_reconfigure.client.Client(
                 "aleph2/drivetrain/joints/wheel_RR_joint",
                 timeout=1,
-                config_callback=self.get_config_callback(3)
+                config_callback=self.get_config_callback(3),
             )
         except rospy.ROSException:
             rospy.logerr(
-                "Could not initialize dynamic reconfigure clients for wheel joints")
+                "Could not initialize dynamic reconfigure clients for wheel joints"
+            )
             self.reconfigure_broken = True
 
         self.setup_signals()
@@ -140,29 +138,26 @@ class Aleph2DrivetrainController(Plugin):
         self.sub_odom = rospy.Subscriber(
             "aleph2/drivetrain/controllers/diff_drive/odom",
             Odometry,
-            self.odom_callback
+            self.odom_callback,
         )
 
         self.sub_usage = rospy.Subscriber(
-            "aleph2/drivetrain_control_loop/usage",
-            Float32,
-            self.usage_callback
+            "aleph2/drivetrain_control_loop/usage", Float32, self.usage_callback
         )
 
         self.selector = JoystickSelector(
-            self.input_callback, self.InputPanel("ControllersList"))
+            self.input_callback, self.InputPanel("ControllersList")
+        )
         self.selector.controllerChanged.connect(self.ResetSensitivity)
         self.steerer = SteeringModule()
 
         self.refresh_signal.emit()
 
-        self.check_driver_thread = threading.Thread(
-            target=self.check_driver_loop)
+        self.check_driver_thread = threading.Thread(target=self.check_driver_loop)
         self.check_driver_thread.daemon = True
         self.check_driver_thread.start()
 
-        self.ignore_planner_thread = threading.Thread(
-            target=self.ignore_planner_loop)
+        self.ignore_planner_thread = threading.Thread(target=self.ignore_planner_loop)
         self.ignore_planner_thread.daemon = True
         self.ignore_planner_thread.start()
 
@@ -205,16 +200,13 @@ class Aleph2DrivetrainController(Plugin):
 
     @pyqtSlot()
     def slot_refresh_odom(self):
-        self.OdomPanel("PBF").setValue(
-            abs(self.odometry.twist.twist.linear.x * 15))
+        self.OdomPanel("PBF").setValue(abs(self.odometry.twist.twist.linear.x * 15))
         if self.odometry.twist.twist.angular.z > 0:
-            self.OdomPanel("PBDR").setValue(
-                self.odometry.twist.twist.angular.z * 20)
+            self.OdomPanel("PBDR").setValue(self.odometry.twist.twist.angular.z * 20)
             self.OdomPanel("PBDL").setValue(0)
         else:
             self.OdomPanel("PBDR").setValue(0)
-            self.OdomPanel(
-                "PBDL").setValue(-self.odometry.twist.twist.angular.z * 20)
+            self.OdomPanel("PBDL").setValue(-self.odometry.twist.twist.angular.z * 20)
 
     @pyqtSlot()
     def slot_refresh_gui(self):
@@ -242,46 +234,43 @@ class Aleph2DrivetrainController(Plugin):
         self.power[0] = self.PowerPanel("PFL").isChecked()
         self.brake[0] = self.PowerPanel("BFL").isChecked()
 
-        self.FLConfigClient.update_configuration({
-            "power": self.power[0],
-            "brake": self.brake[0]
-        })
+        self.FLConfigClient.update_configuration(
+            {"power": self.power[0], "brake": self.brake[0]}
+        )
 
     @pyqtSlot()
     def BLConfigChanged(self):
         self.power[1] = self.PowerPanel("PBL").isChecked()
         self.brake[1] = self.PowerPanel("BBL").isChecked()
 
-        self.BLConfigClient.update_configuration({
-            "power": self.power[1],
-            "brake": self.brake[1]
-        })
+        self.BLConfigClient.update_configuration(
+            {"power": self.power[1], "brake": self.brake[1]}
+        )
 
     @pyqtSlot()
     def FRConfigChanged(self):
         self.power[2] = self.PowerPanel("PFR").isChecked()
         self.brake[2] = self.PowerPanel("BFR").isChecked()
 
-        self.FRConfigClient.update_configuration({
-            "power": self.power[2],
-            "brake": self.brake[2]
-        })
+        self.FRConfigClient.update_configuration(
+            {"power": self.power[2], "brake": self.brake[2]}
+        )
 
     @pyqtSlot()
     def BRConfigChanged(self):
         self.power[3] = self.PowerPanel("PBR").isChecked()
         self.brake[3] = self.PowerPanel("BBR").isChecked()
 
-        self.BRConfigClient.update_configuration({
-            "power": self.power[3],
-            "brake": self.brake[3]
-        })
+        self.BRConfigClient.update_configuration(
+            {"power": self.power[3], "brake": self.brake[3]}
+        )
 
     def get_config_callback(self, wheel):
         def ConfigCallback(config):
             self.power[wheel] = config.power
             self.brake[wheel] = config.brake
             self.refresh_signal.emit()
+
         return ConfigCallback
 
     def setup_signals(self):
@@ -325,7 +314,8 @@ class Aleph2DrivetrainController(Plugin):
             self.input_temp_active = data.buttons[self.BTN_TEMP_ACTIVE]
         except IndexError as e:
             rospy.logerr_throttle(
-                3, "Pad jest zbyt biedny w przyciski | drivetrain_controller")
+                3, "Pad jest zbyt biedny w przyciski | drivetrain_controller"
+            )
 
         if len(data.buttons_pressed) > 0:
             self.refresh_signal.emit()
@@ -352,8 +342,7 @@ class Aleph2DrivetrainController(Plugin):
             self.driver_online.wait()
 
             while time.time() < self.last_update + self.DRIVER_TIMEOUT:
-                time.sleep(self.last_update -
-                           time.time() + self.DRIVER_TIMEOUT)
+                time.sleep(self.last_update - time.time() + self.DRIVER_TIMEOUT)
 
             self.driver_online.clear()
             self.refresh_signal.emit()
@@ -383,6 +372,6 @@ class Aleph2DrivetrainController(Plugin):
         pass
 
     # def trigger_configuration(self):
-        # Comment in to signal that the plugin has a way to configure
-        # This will enable a setting button (gear icon) in each dock widget title bar
-        # Usually used to open a modal configuration dialog
+    # Comment in to signal that the plugin has a way to configure
+    # This will enable a setting button (gear icon) in each dock widget title bar
+    # Usually used to open a modal configuration dialog

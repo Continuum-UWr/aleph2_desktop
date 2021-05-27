@@ -28,21 +28,22 @@ class Aleph2ManipController(Plugin):
 
     def __init__(self, context):
         super(Aleph2ManipController, self).__init__(context)
-        self.setObjectName('Aleph2ManipController')
+        self.setObjectName("Aleph2ManipController")
 
         self._widget = QWidget()
 
         ui_file = os.path.join(
             rospkg.RosPack().get_path("aleph2_gui"),
-            "resources/ui/aleph2_manip_controller.ui"
+            "resources/ui/aleph2_manip_controller.ui",
         )
 
         loadUi(ui_file, self._widget)
-        self._widget.setObjectName('ManipulatorUi')
+        self._widget.setObjectName("ManipulatorUi")
 
         if context.serial_number() > 1:
-            self._widget.setWindowTitle("{} ({})".format(
-                self._widget.windowTitle(), context.serial_number()))
+            self._widget.setWindowTitle(
+                "{} ({})".format(self._widget.windowTitle(), context.serial_number())
+            )
         context.add_widget(self._widget)
 
         self.sensitivity = 0
@@ -51,11 +52,12 @@ class Aleph2ManipController(Plugin):
 
         self.effortController = EffortController()
 
-        self.selector = JoystickSelector(self.input_callback, self.InputPanel("ControllersList"))
+        self.selector = JoystickSelector(
+            self.input_callback, self.InputPanel("ControllersList")
+        )
         self.selector.controllerChanged.connect(self.ResetSensitivity)
 
-        self.InputPanel("SBSENS").valueChanged.connect(
-            self.SensitivityChanged)
+        self.InputPanel("SBSENS").valueChanged.connect(self.SensitivityChanged)
         self.SensitivityChanged()
 
     @pyqtSlot()
@@ -65,8 +67,7 @@ class Aleph2ManipController(Plugin):
     @pyqtSlot()
     def SensitivityChanged(self):
         self.sensitivity = self.InputPanel("SBSENS").value()
-        self.sensitivity_value = math.pow(
-            self.SENSITIVITY_STEP, self.sensitivity)
+        self.sensitivity_value = math.pow(self.SENSITIVITY_STEP, self.sensitivity)
 
     def input_callback(self, data):  # noqa
         axes = []
@@ -113,9 +114,7 @@ class EffortController:
         "wrist_roll": [3],
         "wrist_tilt": [4],
     }
-    JOINT_KEYS = {
-        "gripper": ([0], [1])
-    }
+    JOINT_KEYS = {"gripper": ([0], [1])}
     BASE_MULTPLIER = 50.0
     MULTPLIER = {
         "base": 1.0,
@@ -130,28 +129,34 @@ class EffortController:
         self.pubs = {}
         for name in self.JOINT_NAMES:
             self.pubs[name] = rospy.Publisher(
-                "aleph2/manip/controllers/effort/{}/command".format(name), Float64, queue_size=1)
+                "aleph2/manip/controllers/effort/{}/command".format(name),
+                Float64,
+                queue_size=1,
+            )
 
     def input_callback(self, data, sens_mult):
         axes = list(data.axes)
-        axes[2] = (axes[2]+1)/2
-        axes[5] = -(axes[5]+1)/2
+        axes[2] = (axes[2] + 1) / 2
+        axes[5] = -(axes[5] + 1) / 2
 
         try:
             for axisName in self.JOINT_AXES:
-                mult = sens_mult*self.BASE_MULTPLIER*self.MULTPLIER[axisName]
+                mult = sens_mult * self.BASE_MULTPLIER * self.MULTPLIER[axisName]
                 value = sum([axes[i] for i in self.JOINT_AXES[axisName]])
 
                 value = mult * value
                 self.pubs[axisName].publish(Float64(value))
 
             for axisName in self.JOINT_KEYS:
-                mult = sens_mult*self.BASE_MULTPLIER*self.MULTPLIER[axisName]
-                value = 1*sum([data.buttons[i] for i in self.JOINT_KEYS[axisName][0]]) + \
-                    -1*sum([data.buttons[i] for i in self.JOINT_KEYS[axisName][1]])
+                mult = sens_mult * self.BASE_MULTPLIER * self.MULTPLIER[axisName]
+                value = 1 * sum(
+                    [data.buttons[i] for i in self.JOINT_KEYS[axisName][0]]
+                ) + -1 * sum([data.buttons[i] for i in self.JOINT_KEYS[axisName][1]])
 
                 value = mult * value
-                #print(value)
+                # print(value)
                 self.pubs[axisName].publish(Float64(value))
         except IndexError as e:
-            rospy.logerr_throttle(3, "Pad jest zbyt biedny w przyciski | manip_controller")
+            rospy.logerr_throttle(
+                3, "Pad jest zbyt biedny w przyciski | manip_controller"
+            )

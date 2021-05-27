@@ -34,7 +34,8 @@ class JoystickSelector(QObject):
         self.devicesUpdated.connect(self.build_list)
         self.controllerChanged.connect(self.build_list)
         self.devices_sub = rospy.Subscriber(
-            "input/devices_list", DeviceList, self.devices_callback)
+            "input/devices_list", DeviceList, self.devices_callback
+        )
 
         self.devicesUpdated.emit()
 
@@ -85,7 +86,8 @@ class JoystickSelector(QObject):
         for node in self.devices_dict.keys():
             if self.selected_dev in self.devices_dict[node]:
                 self.sub_input = rospy.Subscriber(
-                    node + "/" + self.selected_dev, Input, self.client_callback)
+                    node + "/" + self.selected_dev, Input, self.client_callback
+                )
 
                 break
 
