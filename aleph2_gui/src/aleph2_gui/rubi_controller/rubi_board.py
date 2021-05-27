@@ -8,12 +8,10 @@ import rospy
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import (
-    QWidget, QTextEdit, QSpinBox, QDoubleSpinBox)
-from python_qt_binding.QtCore import (pyqtSlot, pyqtSignal, QEvent, QObject)
+from python_qt_binding.QtWidgets import QWidget, QTextEdit, QSpinBox, QDoubleSpinBox
+from python_qt_binding.QtCore import pyqtSlot, pyqtSignal, QEvent, QObject
 
-from rubi_server.srv import (
-    ShowBoards, BoardDescriptor, FieldDescriptor, FuncDescriptor)
+from rubi_server.srv import ShowBoards, BoardDescriptor, FieldDescriptor, FuncDescriptor
 
 
 class RubiQTextEdit(QTextEdit):
@@ -41,15 +39,16 @@ class QTextEditEventFilter(QObject):
         else:
             if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Return:
                 max_len = 31
-                (type, field) = obj.objectName().split('_')
+                (type, field) = obj.objectName().split("_")
 
-                if type == 'tln':
+                if type == "tln":
                     max_len = 255
                 text = obj.toPlainText()
                 rospy.loginfo(text)
                 if len(text) > max_len:
                     rospy.logwarn(
-                        "RC: text too long (>%s), thus has been truncated", max_len)
+                        "RC: text too long (>%s), thus has been truncated", max_len
+                    )
                     text = text[:max_len]
                 obj.setPlainText(text)
                 obj.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
