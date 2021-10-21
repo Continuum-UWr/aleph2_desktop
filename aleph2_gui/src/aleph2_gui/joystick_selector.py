@@ -28,6 +28,7 @@ class JoystickSelector(QObject):
         self.devices = [NONE_DEV]
         self.active_dict = {}
         self.active = [False]
+        self.selected_object = None
 
         self.sub_input = 0
         self.widget.itemClicked.connect(self.device_selected)
@@ -64,7 +65,9 @@ class JoystickSelector(QObject):
         self.widget.addItems(self.devices)
         for i in range(len(self.active)):
             if self.widget.item(i).text() == self.selected_dev:
-                self.widget.item(i).setBackground(COLOR_BLUE)
+                self.selected_object = self.widget.item(i)
+                self.selected_object.setBackground(COLOR_BLUE)
+                #self.widget.item(i).setBackground(COLOR_BLUE)
                 continue
 
             if self.active[i]:
@@ -83,6 +86,8 @@ class JoystickSelector(QObject):
             return
 
         if self.active[clicked_index]:
+            self.widget.setCurrentItem(self.selected_object)
+            self.controllerChanged.emit()
             rospy.logwarn("%s: DEVICE ALREADY USED", text)
             return
 
