@@ -27,7 +27,7 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
 
-  <exec_depend>input_msgs</exec_depend>
+  <exec_depend>input_manager</exec_depend>
   <exec_depend>aleph2_msgs</exec_depend>
 
   <export>
