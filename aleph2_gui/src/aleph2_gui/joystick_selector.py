@@ -67,7 +67,7 @@ class JoystickSelector(QObject):
             if self.widget.item(i).text() == self.selected_dev:
                 self.selected_object = self.widget.item(i)
                 self.selected_object.setBackground(COLOR_BLUE)
-                #self.widget.item(i).setBackground(COLOR_BLUE)
+                # self.widget.item(i).setBackground(COLOR_BLUE)
                 continue
 
             if self.active[i]:
@@ -90,7 +90,6 @@ class JoystickSelector(QObject):
             self.controllerChanged.emit()
             rospy.logwarn("%s: DEVICE ALREADY USED", text)
             return
-
 
         if text == self.selected_dev:
             return
