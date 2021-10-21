@@ -74,14 +74,27 @@ class JoystickSelector(QObject):
 
     @pyqtSlot()
     def device_selected(self):
-        if self.widget.currentItem().text() == self.selected_dev:
+        text = self.widget.currentItem().text()
+        clicked_index = -1
+        try:
+            clicked_index = self.devices.index(text)
+        except ValueError:
+            rospy.logerr("%s: NOT IN DEVICES LIST", text)
+            return
+
+        if self.active[clicked_index]:
+            rospy.logwarn("%s: DEVICE ALREADY USED", text)
+            return
+
+
+        if text == self.selected_dev:
             return
 
         if self.selected_dev != NONE_DEV:
             self.sub_input.unregister()
             self.sub_input = 0
 
-        self.selected_dev = self.widget.currentItem().text()
+        self.selected_dev = text
         self.controllerChanged.emit()
         for node in self.devices_dict.keys():
             if self.selected_dev in self.devices_dict[node]:
