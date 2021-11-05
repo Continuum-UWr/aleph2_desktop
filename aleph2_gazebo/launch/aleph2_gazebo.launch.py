@@ -47,10 +47,10 @@ def generate_launch_description():
                     "verbose": LaunchConfiguration("verbose"),
                 }.items(),
             ),
-            # IncludeLaunchDescription(
-            #     PythonLaunchDescriptionSource(
-            #         [pkg_share, "/launch/spawn_robot.launch.py"]
-            #     )
-            # ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    [pkg_share, "/launch/spawn_robot.launch.py"]
+                )
+            ),
         ]
     )
