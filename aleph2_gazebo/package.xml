@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>aleph2_gazebo</name>
+  <version>0.0.0</version>
+  <description>
+    Launch files and other resources for simulating Aleph2 in Gazebo.
+  </description>
+
+  <maintainer email="continuum@cs.uni.wroc.pl">Continuum Rover Team</maintainer>
+  <author>Błażej Sowa</author>
+
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>gazebo_plugins</exec_depend>
+  <exec_depend>gazebo_ros2_control</exec_depend>
+  <exec_depend>joint_state_broadcaster</exec_depend>
+  <exec_depend>diff_drive_controller</exec_depend>
+
+  <export>
+    <architecture_independent/>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+</package>
