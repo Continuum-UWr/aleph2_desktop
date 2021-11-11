@@ -1,10 +1,12 @@
 from rclpy.node import Node
+from rclpy.impl.rcutils_logger import RcutilsLogger
 from rclpy.qos import QoSDurabilityPolicy, QoSProfile, QoSReliabilityPolicy
 
 from input_manager.msg import Input
 from input_manager.msg import DeviceList
 from python_qt_binding.QtCore import pyqtSlot, pyqtSignal, QObject
 from python_qt_binding.QtGui import QColor
+from python_qt_binding.QtWidgets import QWidget
 
 COLOR_BLUE = QColor("#3a3a99")
 COLOR_RED = QColor("#bf2626")
@@ -16,12 +18,12 @@ class JoystickSelector(QObject):
     controllerChanged = pyqtSignal()
     devicesUpdated = pyqtSignal()
 
-    def __init__(self, node: Node, callback, widget):
+    def __init__(self, node: Node, logger: RcutilsLogger, callback, widget: QWidget):
         super(JoystickSelector, self).__init__()
         self._node = node
         self._widget = widget
         self._callback = callback
-        self._logger = node.get_logger().get_child("JoystickSelector")
+        self._logger = logger.get_child("JoystickSelector")
 
         self.devices_dict = {}
         self.selected_dev = NONE_DEV

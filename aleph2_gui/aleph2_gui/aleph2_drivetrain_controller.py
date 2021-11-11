@@ -99,7 +99,10 @@ class Aleph2DrivetrainController(Plugin):
         )
 
         self.selector = JoystickSelector(
-            self._node, self.input_callback, self.InputPanel("ControllersList")
+            self._node,
+            self._logger,
+            self.input_callback,
+            self.InputPanel("ControllersList"),
         )
 
         self.setup_signals()
