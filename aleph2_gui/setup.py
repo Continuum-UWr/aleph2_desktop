@@ -18,5 +18,5 @@ setup(
     maintainer_email="continuum@cs.uni.wroc.pl",
     description="Graphic interfaces for Aleph2",
     license="MIT",
-    scripts=['scripts/aleph2_drivetrain_controller'],
+    scripts=["scripts/aleph2_drivetrain_controller", "scripts/aleph2_manip_controller"],
 )
