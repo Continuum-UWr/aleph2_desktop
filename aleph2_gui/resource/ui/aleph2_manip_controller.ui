@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ManipulatorController</class>
+ <widget class="QWidget" name="ManipulatorController">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>650</width>
+    <height>383</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>650</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+	background-image: url(:/ta-skin/bg1.gif);
+}
+
+QLabel, QCheckBox, QTextEdit, QLineEdit, QGroupBox, QDoubleSpinBox, QSpinBox{
+	font: bold 10px, &quot;Segoe UI Black&quot;;
+	color: rgb(220, 220, 155);
+    background-color: transparent;
+}
+
+QLabel, QCheckBox{
+	border-image: url(:/ta-skin/label.gif) 11 22 10 12 repeat stretch ;
+	border-width: 10;
+}
+
+QCheckBox{
+	spacing: 3;
+}
+
+QCheckBox::indicator::checked, QCheckBox::indicator::unchecked{
+    width: 19px;
+    height: 19px;
+}
+
+QCheckBox::indicator::unchecked{
+    border-image: url(:/ta-skin/lmp_off.png) 0 stretch
+}
+
+QCheckBox::indicator::checked{
+    border-image: url(:/ta-skin/lmp_on.png) 0 stretch
+}
+
+QPushButton{
+	font: bold 10px, &quot;Segoe UI Black&quot;;
+	color: rgb(40, 20, 20);
+	border-width: 8;
+    border-image: url(:/ta-skin/button.gif) 10 12 11 14 repeat repeat 
+}
+
+QPushButton:pressed {
+	border-image: url(:/ta-skin/button_pressed.gif) 10 12 11 14 repeat repeat
+}
+
+QScrollBar:horizontal {
+    border-image: url(:/ta-skin/scroll_bg.png) 0 repeat stretch;
+    height: 15px;
+    margin: 0px 20px 0 20px;
+}
+
+QScrollBar::handle:horizontal {
+    border-image: url(:/ta-skin/bar.png) 0 stretch;
+    min-width: 5px;
+    max-width: 5px;
+}
+
+QScrollBar::add-line:horizontal {
+    border-image: url(:/ta-skin/arrow_off_right.png) 0 stretch;
+    width: 20px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal:pressed {
+    border-image: url(:/ta-skin/arrow_on_left.png) 0 stretch;
+}
+
+QScrollBar::add-line:horizontal:pressed {
+    border-image: url(:/ta-skin/arrow_on_right.png) 0 stretch;
+}
+
+QScrollBar::sub-line:horizontal {
+    border-image: url(:/ta-skin/arrow_off_left.png) 0 stretch;
+    width: 20px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+QGroupBox{
+    border-image: url(:/ta-skin/label-bg.png) 13 23 12 12 repeat repeat ;
+    border-width: 10;
+}
+
+QGroupBox::title{
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    margin: 0 3
+}
+
+QLineEdit, QDoubleSpinBox, QSpinBox{
+    padding: 0 3;
+	border-color: #444444;
+	border-style: inset;
+	border-width: 2;
+}
+
+QDoubleSpinBox::up-arrow, QSpinBox::up-arrow {
+    image: url(:/ta-skin/arrow_off_up.png) 0 stretch;
+}
+
+QDoubleSpinBox::down-arrow, QSpinBox::down-arrow {
+    image: url(:/ta-skin/arrow_off_down.png) 0 stretch;
+}
+
+QDoubleSpinBox::up-arrow:pressed, QSpinBox::up-arrow:pressed {
+    image: url(:/ta-skin/arrow_on_up.png) 0 stretch;
+}
+
+QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
+    image: url(:/ta-skin/arrow_on_down.png) 0 stretch;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="styleSheet">
+      <string notr="true">	QWidget{
+	background-image: url(:/ta-skin/bg1.gif);
+}
+
+QLabel, QCheckBox, QTextEdit, QLineEdit, QGroupBox, QDoubleSpinBox, QSpinBox{
+	font: bold 10px, &quot;Segoe UI Black&quot;;
+	color: rgb(220, 220, 155);
+    background-color: transparent;
+}
+
+QProgressBar{
+    border-image: url(:/ta-skin/chunk_empty.png) 0 repeat stretch;
+    font: 1px, &quot;Segoe UI Black&quot;;
+}
+
+QProgressBar::chunk {
+    border-image: url(:/ta-skin/chunk_full.png) 0 repeat stretch;
+}
+
+QLabel, QCheckBox{
+	border-image: url(:/ta-skin/label2.png) 11 22 10 12 repeat stretch ;
+	border-width: 10;
+}
+
+QCheckBox{
+	spacing: 3;
+}
+
+QCheckBox::indicator::checked, QCheckBox::indicator::unchecked{
+    width: 19px;
+    height: 19px;
+}
+
+QCheckBox::indicator:unchecked:disabled{
+    border-image: url(:/ta-skin/lmp_off.png) 0 stretch
+}
+
+QCheckBox::indicator:checked:disabled{
+    border-image: url(:/ta-skin/lmp_on.png) 0 stretch
+}
+
+QCheckBox::indicator:unchecked:enabled{
+    border-image: url(:/ta-skin/lmp_off_locked.png) 0 stretch
+}
+
+QCheckBox::indicator:checked:enabled{
+    border-image: url(:/ta-skin/lmp_on_locked.png) 0 stretch
+}
+
+QPushButton{
+	font: bold 10px, &quot;Segoe UI Black&quot;;
+	color: rgb(40, 20, 20);
+	border-width: 8;
+    border-image: url(:/ta-skin/button.gif) 10 12 11 14 repeat repeat 
+}
+
+QPushButton:pressed {
+	border-image: url(:/ta-skin/button_pressed.gif) 10 12 11 14 repeat repeat
+}
+
+QScrollBar:horizontal {
+    border-image: url(:/ta-skin/scroll_bg.png) 0 repeat stretch;
+    height: 15px;
+    margin: 0px 20px 0 20px;
+}
+
+QScrollBar::handle:horizontal {
+    border-image: url(:/ta-skin/bar.png) 0 stretch;
+    min-width: 5px;
+    max-width: 5px;
+}
+
+QScrollBar::add-line:horizontal {
+    border-image: url(:/ta-skin/arrow_off_right.png) 0 stretch;
+    width: 20px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal:pressed {
+    border-image: url(:/ta-skin/arrow_on_left.png) 0 stretch;
+}
+
+QScrollBar::add-line:horizontal:pressed {
+    border-image: url(:/ta-skin/arrow_on_right.png) 0 stretch;
+}
+
+QScrollBar::sub-line:horizontal {
+    border-image: url(:/ta-skin/arrow_off_left.png) 0 stretch;
+    width: 20px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+QGroupBox{
+    border-image: url(:/ta-skin/label-bg.png) 13 23 12 12 repeat repeat ;
+    border-width: 10;
+}
+
+QGroupBox::title{
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    margin: 0 3
+}
+
+QLineEdit, QDoubleSpinBox, QSpinBox{
+    padding: 0 3;
+	border-color: #444444;
+	border-style: inset;
+	border-width: 2;
+}
+
+QDoubleSpinBox::up-arrow, QSpinBox::up-arrow {
+    image: url(:/ta-skin/arrow_off_up.png) 0 stretch;
+}
+
+QDoubleSpinBox::down-arrow, QSpinBox::down-arrow {
+    image: url(:/ta-skin/arrow_off_down.png) 0 stretch;
+}
+
+QDoubleSpinBox::up-arrow:pressed, QSpinBox::up-arrow:pressed {
+    image: url(:/ta-skin/arrow_on_up.png) 0 stretch;
+}
+
+QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
+    image: url(:/ta-skin/arrow_on_down.png) 0 stretch;
+}</string>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>630</width>
+        <height>363</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>610</width>
+        <height>340</height>
+       </size>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0" colspan="2">
+        <widget class="QGroupBox" name="PIN">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="title">
+          <string> INPUT</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_16">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Sensitivity</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="SBXSENS">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="minimum">
+               <number>-5</number>
+              </property>
+              <property name="maximum">
+               <number>7</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QScrollBar" name="SBSENS">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="minimum">
+             <number>-1</number>
+            </property>
+            <property name="maximum">
+             <number>7</number>
+            </property>
+            <property name="pageStep">
+             <number>1</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Controller</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QListWidget" name="ControllersList">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 255, 127);</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../ta.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>SBXSENS</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>SBSENS</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>205</x>
+     <y>230</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>205</x>
+     <y>250</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SBSENS</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>SBXSENS</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>173</x>
+     <y>250</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>190</x>
+     <y>230</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

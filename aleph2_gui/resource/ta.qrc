@@ -1,0 +1,34 @@
+<RCC>
+  <qresource>
+    <file>ta-skin/lmp_on_locked.png</file>
+    <file>ta-skin/sleep_nope.png</file>
+    <file>ta-skin/lmp_off_locked.png</file>
+    <file>ta-skin/arrow_off_down.png</file>
+    <file>ta-skin/arrow_off_left.png</file>
+    <file>ta-skin/arrow_off_right.png</file>
+    <file>ta-skin/arrow_off_up.png</file>
+    <file>ta-skin/arrow_on_down.png</file>
+    <file>ta-skin/arrow_on_left.png</file>
+    <file>ta-skin/arrow_on_right.png</file>
+    <file>ta-skin/arrow_on_up.png</file>
+    <file>ta-skin/bar.png</file>
+    <file>ta-skin/bg1.gif</file>
+    <file>ta-skin/bg2.gif</file>
+    <file>ta-skin/bg3.gif</file>
+    <file>ta-skin/BoxLeft.gif</file>
+    <file>ta-skin/BoxRight.gif</file>
+    <file>ta-skin/label2.png</file>
+    <file>ta-skin/chunk_full.png</file>
+    <file>ta-skin/chunk_empty.png</file>
+    <file>ta-skin/button.gif</file>
+    <file>ta-skin/button.png</file>
+    <file>ta-skin/button_pressed.gif</file>
+    <file>ta-skin/ButtonUp5.gif</file>
+    <file>ta-skin/label-bg.png</file>
+    <file>ta-skin/label.gif</file>
+    <file>ta-skin/label.png</file>
+    <file>ta-skin/lmp_off.png</file>
+    <file>ta-skin/lmp_on.png</file>
+    <file>ta-skin/scroll_bg.png</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>aleph2_gui</name>
+  <version>0.0.0</version>
+  <description>
+    Graphic interfaces for Aleph2
+  </description>
+
+  <maintainer email="continuum@cs.uni.wroc.pl">Continuum Rover Team</maintainer>
+  <author>Błażej Sowa</author>
+
+  <license>MIT</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>python_qt_binding</exec_depend>
+  <exec_depend>rqt_gui</exec_depend>
+  <exec_depend>rqt_gui_py</exec_depend>
+
+  <exec_depend>input_manager</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+    <rqt_gui plugin="${prefix}/rqt_plugins.xml"/>
+  </export>
+
+</package>
