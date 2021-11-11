@@ -36,7 +36,7 @@ class Aleph2DrivetrainController(Plugin):
     AXIS_LINEAR = 1
     AXIS_ANGULAR = 3
 
-    SENSITIVITY_MULTIPLIER = 1.33
+    SENSITIVITY_STEP = 1.33
     LINEAR_MULTIPLIER = -1.11
     ANGULAR_MULTIPLIER = -2.22
 
@@ -128,7 +128,7 @@ class Aleph2DrivetrainController(Plugin):
 
     @pyqtSlot(int)
     def slot_change_sensitivity(self, value):
-        self.sensitivity = self.SENSITIVITY_MULTIPLIER ** value
+        self.sensitivity = self.SENSITIVITY_STEP ** value
         self.sensitivity_level = value
 
     @pyqtSlot()
