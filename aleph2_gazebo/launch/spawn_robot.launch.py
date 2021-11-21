@@ -13,7 +13,7 @@ def generate_launch_description():
         [
             DeclareLaunchArgument(
                 name="model",
-                default_value=[aleph2_description_share, "/urdf/aleph2.urdf.xacro"],
+                default_value=[aleph2_description_share, "/urdf/aleph2_sim.urdf.xacro"],
                 description="Absolute path to robot urdf.xacro file",
             ),
             DeclareLaunchArgument(
@@ -54,17 +54,17 @@ def generate_launch_description():
                 ],
                 # fmt: on
             ),
-            # Node(
-            #     name="joint_state_broadcaster_spawner",
-            #     package="controller_manager",
-            #     executable="spawner.py",
-            #     arguments=["joint_state_broadcaster"],
-            # ),
-            # Node(
-            #     name="diff_drive_controller_spawner",
-            #     package="controller_manager",
-            #     executable="spawner.py",
-            #     arguments=["diff_drive_controller"],
-            # ),
+            Node(
+                name="joint_state_broadcaster_spawner",
+                package="controller_manager",
+                executable="spawner",
+                arguments=["joint_state_broadcaster"],
+            ),
+            Node(
+                name="diff_drive_controller_spawner",
+                package="controller_manager",
+                executable="spawner",
+                arguments=["diff_drive_controller"],
+            ),
         ]
     )
