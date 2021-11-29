@@ -1,0 +1,10 @@
+<library path="aleph2_gazebo_hardware_plugins">
+  <class 
+    name="aleph2_gazebo/Aleph2GazeboSystem"
+    type="aleph2_gazebo::Aleph2GazeboSystem"
+    base_class_type="gazebo_ros2_control::GazeboSystemInterface">
+    <description>
+      ros2_control Gazebo System for Aleph2.
+    </description>
+  </class>
+</library>
