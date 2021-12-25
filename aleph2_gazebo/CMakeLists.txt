@@ -23,11 +23,9 @@ install(
 install(
   TARGETS
     aleph2_gazebo_differential_plugin
+  EXPORT ${PROJECT_NAME}Targets
   LIBRARY DESTINATION lib
 )
 
-ament_export_libraries(
-  aleph2_gazebo_differential_plugin
-)
-
+ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
 ament_package()
