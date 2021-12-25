@@ -1,0 +1,19 @@
+<launch version="0.1.1">
+  <arg name="world" default=""
+    description="Path to the world file for gazebo." />
+  <arg name="paused" default="false"
+    description='Set to "true" to start gazebo server in a paused state.' />
+  <arg name="gui" default="true"
+    description='Set to "false" to run Gazebo headless.' />
+  <arg name="verbose" default="false"
+    description='Set to "true" to increase messages written to terminal.' />
+
+  <include file="$(find-pkg-share gazebo_ros)/launch/gazebo.launch.py">
+    <arg name="world" value="$(var world)" />
+    <arg name="pause" value="$(var paused)" />
+    <arg name="gui" value="$(var gui)" />
+    <arg name="verbose" value="$(var verbose)" />
+  </include>
+
+  <include file="$(find-pkg-share aleph2_gazebo)/launch/spawn_robot.launch.xml" />
+</launch>
