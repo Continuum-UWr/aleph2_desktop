@@ -7,9 +7,9 @@ from rqt_gui.ros2_plugin_context import Ros2PluginContext
 from ament_index_python import get_resource
 
 from rqt_gui_py.plugin import Plugin
-from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget
-from python_qt_binding.QtCore import pyqtSlot, pyqtSignal
+from qtpy import loadUi
+from qtpy.QtWidgets import QWidget
+from qtpy.QtCore import pyqtSlot, pyqtSignal
 
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool, Float32

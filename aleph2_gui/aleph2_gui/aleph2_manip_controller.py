@@ -7,8 +7,8 @@ from ament_index_python import get_resource
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget
-from python_qt_binding.QtCore import pyqtSlot, pyqtSignal
+from qtpy.QtWidgets import QWidget
+from qtpy.QtCore import pyqtSlot, pyqtSignal
 
 import aleph2_gui.resources.ta
 from aleph2_gui.joystick_selector import JoystickSelector

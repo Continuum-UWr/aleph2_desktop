@@ -3,10 +3,9 @@ from rclpy.impl.rcutils_logger import RcutilsLogger
 from rclpy.qos import QoSDurabilityPolicy, QoSProfile, QoSReliabilityPolicy
 
 from input_manager.msg import Input
-from input_manager.msg import DeviceList
-from python_qt_binding.QtCore import pyqtSlot, pyqtSignal, QObject
-from python_qt_binding.QtGui import QColor
-from python_qt_binding.QtWidgets import QWidget
+from qtpy.QtCore import pyqtSlot, pyqtSignal, QObject
+from qtpy.QtGui import QColor
+from qtpy.QtWidgets import QListWidget
 
 COLOR_BLUE = QColor("#3a3a99")
 COLOR_RED = QColor("#bf2626")
