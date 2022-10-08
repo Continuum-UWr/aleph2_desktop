@@ -27,6 +27,10 @@
 	background-image: url(:/ta-skin/bg1.gif);
 }
 
+QListWidget{
+	background: #1b1e20;
+}
+
 QLabel, QCheckBox, QTextEdit, QLineEdit, QGroupBox, QDoubleSpinBox, QSpinBox{
 	font: bold 10px, &quot;Segoe UI Black&quot;;
 	color: rgb(220, 220, 155);
@@ -282,8 +286,8 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>630</width>
-        <height>363</height>
+        <width>634</width>
+        <height>367</height>
        </rect>
       </property>
       <property name="minimumSize">

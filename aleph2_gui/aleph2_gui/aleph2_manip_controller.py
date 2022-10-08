@@ -11,7 +11,7 @@ os.environ["QT_API"] = "pyqt5"
 
 from qtpy.uic import loadUi
 from qtpy.QtWidgets import QWidget
-from qtpy.QtCore import pyqtSlot, pyqtSignal
+from qtpy.QtCore import Slot, Signal
 
 import aleph2_gui.resources.ta
 from aleph2_gui.joystick_selector import JoystickSelector
@@ -21,7 +21,7 @@ from input_manager.msg import Input
 
 
 class Aleph2ManipController(Plugin):
-    refresh_signal = pyqtSignal()
+    refresh_signal = Signal()
 
     BTN_SENS_UP = 7
     BTN_SENS_DOWN = 6
@@ -70,16 +70,16 @@ class Aleph2ManipController(Plugin):
         self.InputPanel("SBSENS").valueChanged.connect(self.slot_change_sensitivty)
         self.selector.controllerChanged.connect(self.slot_reset_sensitivity)
 
-    @pyqtSlot()
+    @Slot()
     def slot_reset_sensitivity(self):
         self.InputPanel("SBSENS").setValue(0)
 
-    @pyqtSlot(int)
+    @Slot(int)
     def slot_change_sensitivty(self, value):
         self.sensitivity = self.SENSITIVITY_STEP ** value
         self.sensitivity_level = value
 
-    @pyqtSlot()
+    @Slot()
     def slot_refresh_gui(self):
         self.InputPanel("SBSENS").setValue(self.sensitivity_level)
 
