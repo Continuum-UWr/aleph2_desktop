@@ -1,0 +1,13 @@
+<launch version="0.1.1">
+
+  <arg name="world" default="empty.sdf" description="The world description to use." />
+
+  <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
+    <arg name="gz_args" value="
+      -r empty.sdf"
+    />
+  </include>
+
+  <include file="$(find-pkg-share aleph2_gz)/launch/spawn_model.launch.xml"/>
+
+</launch>

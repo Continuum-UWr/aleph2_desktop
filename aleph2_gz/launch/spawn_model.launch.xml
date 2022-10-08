@@ -1,0 +1,14 @@
+<launch version="0.1.1">
+
+  <arg name="model" default="$(find-pkg-share aleph2_description)/urdf/aleph2_sim.urdf.xacro" description="Absolute path to robot urdf.xacro file" />
+
+  <include file="$(find-pkg-share aleph2_description)/launch/state_publisher.launch.xml">
+    <arg name="model" value="$(var model)"/>
+  </include>
+
+  <node pkg="ros_gz_sim" exec="create" args="
+    -name aleph2
+    -topic robot_description"
+  />
+
+</launch>

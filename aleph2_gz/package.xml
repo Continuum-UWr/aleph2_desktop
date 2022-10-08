@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>aleph2_gz</name>
+  <version>0.0.0</version>
+  <description>
+    Launch files and other resources for simulating Aleph2 in Gazebo.
+  </description>
+
+  <maintainer email="continuum@cs.uni.wroc.pl">Continuum Rover Team</maintainer>
+  <author>Błażej Sowa</author>
+
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>ros_gz_sim</exec_depend>
+
+  <exec_depend>aleph2_description</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+    <architecture_independent/>
+  </export>
+</package>
