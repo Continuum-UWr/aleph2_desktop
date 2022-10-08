@@ -7,9 +7,12 @@ from rqt_gui.ros2_plugin_context import Ros2PluginContext
 from ament_index_python import get_resource
 
 from rqt_gui_py.plugin import Plugin
-from qtpy import loadUi
+
+os.environ["QT_API"] = "pyqt5"
+
+from qtpy.uic import loadUi
 from qtpy.QtWidgets import QWidget
-from qtpy.QtCore import pyqtSlot, pyqtSignal
+from qtpy.QtCore import Slot, Signal
 
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool, Float32
@@ -20,8 +23,8 @@ from aleph2_gui.joystick_selector import JoystickSelector
 
 
 class Aleph2DrivetrainController(Plugin):
-    refresh_signal = pyqtSignal()
-    odom_refresh_signal = pyqtSignal()
+    refresh_signal = Signal()
+    odom_refresh_signal = Signal()
 
     DRIVER_TIMEOUT = 1.0  # sec
 
@@ -129,31 +132,31 @@ class Aleph2DrivetrainController(Plugin):
     def PowerPanel(self, name):
         return self._widget.PPOWER.findChild(QWidget, name)
 
-    @pyqtSlot(int)
+    @Slot(int)
     def slot_change_sensitivity(self, value):
         self.sensitivity = self.SENSITIVITY_STEP ** value
         self.sensitivity_level = value
 
-    @pyqtSlot()
+    @Slot()
     def slot_reset_sensitivity(self):
         self.InputPanel("ISENSITIVITY").setValue(0)
 
-    @pyqtSlot(bool)
+    @Slot(bool)
     def slot_set_input_active(self, checked):
         self.input_active = checked
 
-    @pyqtSlot(bool)
+    @Slot(bool)
     def slot_toggle_mux_mode(self, checked):
         if not checked:
             self.InputPanel("CBIGNORE").setChecked(False)
         self.InputPanel("CBIGNORE").setEnabled(checked)
         self.mux_mode = checked
 
-    @pyqtSlot(bool)
+    @Slot(bool)
     def slot_toggle_ign_planner(self, checked):
         self.ignore_planner = checked
 
-    @pyqtSlot()
+    @Slot()
     def slot_refresh_odom(self):
         self.OdomPanel("PBF").setValue(abs(self.odometry.twist.twist.linear.x * 15))
         if self.odometry.twist.twist.angular.z > 0:
@@ -163,7 +166,7 @@ class Aleph2DrivetrainController(Plugin):
             self.OdomPanel("PBDR").setValue(0)
             self.OdomPanel("PBDL").setValue(-self.odometry.twist.twist.angular.z * 20)
 
-    @pyqtSlot()
+    @Slot()
     def slot_refresh_gui(self):
         self.DriverPanel("LUSAGE").setText(self.usage_label)
 
@@ -184,7 +187,7 @@ class Aleph2DrivetrainController(Plugin):
         self.PowerPanel("BFR").setChecked(self.brake[2])
         self.PowerPanel("BRR").setChecked(self.brake[3])
 
-    @pyqtSlot()
+    @Slot()
     def slot_FL_config_changed(self):
         self.power[0] = self.PowerPanel("PFL").isChecked()
         self.brake[0] = self.PowerPanel("BFL").isChecked()
@@ -193,7 +196,7 @@ class Aleph2DrivetrainController(Plugin):
         #     {"power": self.power[0], "brake": self.brake[0]}
         # )
 
-    @pyqtSlot()
+    @Slot()
     def slot_RL_config_changed(self):
         self.power[1] = self.PowerPanel("PRL").isChecked()
         self.brake[1] = self.PowerPanel("BRL").isChecked()
@@ -202,7 +205,7 @@ class Aleph2DrivetrainController(Plugin):
         #     {"power": self.power[1], "brake": self.brake[1]}
         # )
 
-    @pyqtSlot()
+    @Slot()
     def slot_FR_config_changed(self):
         self.power[2] = self.PowerPanel("PFR").isChecked()
         self.brake[2] = self.PowerPanel("BFR").isChecked()
@@ -211,7 +214,7 @@ class Aleph2DrivetrainController(Plugin):
         #     {"power": self.power[2], "brake": self.brake[2]}
         # )
 
-    @pyqtSlot()
+    @Slot()
     def slot_RR_config_changed(self):
         self.power[3] = self.PowerPanel("PRR").isChecked()
         self.brake[3] = self.PowerPanel("BRR").isChecked()

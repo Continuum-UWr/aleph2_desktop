@@ -6,7 +6,10 @@ from rqt_gui.ros2_plugin_context import Ros2PluginContext
 from ament_index_python import get_resource
 
 from qt_gui.plugin import Plugin
-from python_qt_binding import loadUi
+
+os.environ["QT_API"] = "pyqt5"
+
+from qtpy.uic import loadUi
 from qtpy.QtWidgets import QWidget
 from qtpy.QtCore import pyqtSlot, pyqtSignal
 

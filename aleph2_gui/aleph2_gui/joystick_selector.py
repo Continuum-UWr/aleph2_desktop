@@ -1,23 +1,38 @@
+from collections.abc import Callable
+
 from rclpy.node import Node
 from rclpy.impl.rcutils_logger import RcutilsLogger
 from rclpy.qos import QoSDurabilityPolicy, QoSProfile, QoSReliabilityPolicy
 
-from input_manager.msg import Input
-from qtpy.QtCore import pyqtSlot, pyqtSignal, QObject
+from input_manager.msg import Input, DeviceList, DeviceInfo
+from qtpy.QtCore import Slot, Signal, QObject, Qt
 from qtpy.QtGui import QColor
-from qtpy.QtWidgets import QListWidget
+from qtpy.QtWidgets import QListWidget, QListWidgetItem
 
-COLOR_BLUE = QColor("#3a3a99")
+# COLOR_BLUE = QColor("#3a3a99")
 COLOR_RED = QColor("#bf2626")
-COLOR_BLACK = QColor(0, 0, 0, 0)
+COLOR_BLACK = QColor(0, 0, 0, 255)
 NONE_DEV = "<None>"
 
 
 class JoystickSelector(QObject):
-    controllerChanged = pyqtSignal()
-    devicesUpdated = pyqtSignal()
+    controllerChanged = Signal()
+    devicesUpdated = Signal()
 
-    def __init__(self, node: Node, logger: RcutilsLogger, callback, widget: QWidget):
+    devices_dict: dict[str, list[DeviceInfo]]
+    selected_dev: str
+    devices: list[str]
+    active_dict: dict[str, list[bool]]
+    active: list[bool]
+    # selected_object: QListWidgetItem
+
+    def __init__(
+        self,
+        node: Node,
+        logger: RcutilsLogger,
+        callback: Callable[[Input], None],
+        widget: QListWidget,
+    ):
         super(JoystickSelector, self).__init__()
         self._node = node
         self._widget = widget
@@ -29,10 +44,10 @@ class JoystickSelector(QObject):
         self.devices = [NONE_DEV]
         self.active_dict = {}
         self.active = [False]
-        self.selected_object = None
+        # self.selected_object = None
 
         self.sub_input = None
-        self._widget.itemClicked.connect(self.slot_select_device)
+        self._widget.itemPressed.connect(self.slot_select_device)
         self.devicesUpdated.connect(self.slot_rebuild_list)
         self.controllerChanged.connect(self.slot_rebuild_list)
 
@@ -55,9 +70,10 @@ class JoystickSelector(QObject):
         self.active_dict[name] = data.active
         self.active = [False]
 
-        for k in self.devices_dict.keys():
-            self.devices += self.devices_dict[k]
-            self.active += self.active_dict[k]
+        for node_name in self.devices_dict.keys():
+            for device in self.devices_dict[node_name]:
+                self.devices.append(device.name)
+            self.active += self.active_dict[node_name]
 
         if self.selected_dev not in self.devices:
             self._node.destroy_subscription(self.sub_input)
@@ -67,38 +83,25 @@ class JoystickSelector(QObject):
 
         self.devicesUpdated.emit()
 
-    @pyqtSlot()
+    @Slot()
     def slot_rebuild_list(self):
         self._widget.clear()
-        self._widget.addItems(self.devices)
-        for i in range(len(self.active)):
-            if self._widget.item(i).text() == self.selected_dev:
-                self.selected_object = self._widget.item(i)
-                self.selected_object.setBackground(COLOR_BLUE)
+        for device, active in zip(self.devices, self.active):
+            item = QListWidgetItem(device)
+
+            self._widget.addItem(item)
+
+            if device == self.selected_dev:
+                item.setSelected(True)
                 continue
 
-            if self.active[i]:
-                self._widget.item(i).setBackground(COLOR_RED)
-            else:
-                self._widget.item(i).setBackground(COLOR_BLACK)
+            if active:
+                item.setBackground(COLOR_RED)
+                item.setFlags(Qt.ItemFlag.NoItemFlags)
 
-    @pyqtSlot()
-    def slot_select_device(self):
-        text = self._widget.currentItem().text()
-        clicked_index = -1
-        try:
-            clicked_index = self.devices.index(text)
-        except ValueError:
-            self._logger.error(
-                f'The selected device "{text}" was not on the device list (possible race condition)'
-            )
-            return
-
-        if self.active[clicked_index]:
-            self._widget.setCurrentItem(self.selected_object)
-            self.controllerChanged.emit()
-            self._logger.warn(f'The selected device "{text}" is already in use')
-            return
+    @Slot(QListWidgetItem)
+    def slot_select_device(self, item):
+        text = item.text()
 
         if text == self.selected_dev:
             return
@@ -109,12 +112,11 @@ class JoystickSelector(QObject):
 
         self.selected_dev = text
         self.controllerChanged.emit()
-        for node in self.devices_dict.keys():
-            if self.selected_dev in self.devices_dict[node]:
-                self.sub_input = self._node.create_subscription(
-                    Input, "input/data/" + self.selected_dev, self._callback, 10
-                )
-                break
+
+        if self.selected_dev != NONE_DEV:
+            self.sub_input = self._node.create_subscription(
+                Input, "input/data/" + self.selected_dev, self._callback, 10
+            )
 
     def shutdown(self):
         if self.sub_input is not None:
