@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>804</width>
-    <height>569</height>
+    <width>762</width>
+    <height>598</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -22,6 +22,10 @@
   <property name="styleSheet">
    <string notr="true">	QWidget{
 	background-image: url(:/ta-skin/bg1.gif);
+}
+
+QListWidget{
+	background: #1b1e20;
 }
 
 QLabel, QCheckBox, QTextEdit, QLineEdit, QGroupBox, QDoubleSpinBox, QSpinBox{
@@ -223,144 +227,177 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="PIN">
+        <widget class="QGroupBox" name="PPOWER">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="title">
-          <string> INPUT</string>
+          <string>POWER</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout">
+         <layout class="QVBoxLayout" name="verticalLayout_8">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
             <item>
-             <widget class="QLabel" name="label_16">
-              <property name="text">
-               <string>Sensitivity</string>
-              </property>
-             </widget>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QCheckBox" name="PFL">
+                <property name="text">
+                 <string>POWER FL</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="BFL">
+                <property name="text">
+                 <string>BREAK FL</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="MFL">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>MAX</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Expanding</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinBox">
-              <property name="minimum">
-               <number>-5</number>
-              </property>
-              <property name="maximum">
-               <number>5</number>
-              </property>
-             </widget>
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <widget class="QCheckBox" name="PFR">
+                <property name="text">
+                 <string>POWER FR</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="BFR">
+                <property name="text">
+                 <string>BREAK FR</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="MFR">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>MAX</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>
           <item>
-           <widget class="QScrollBar" name="ISENSITIVITY">
-            <property name="minimum">
-             <number>-5</number>
-            </property>
-            <property name="maximum">
-             <number>5</number>
-            </property>
-            <property name="pageStep">
-             <number>1</number>
-            </property>
+           <spacer name="verticalSpacer_3">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Vertical</enum>
             </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8">
-            <item>
-             <widget class="QLabel" name="label_17">
-              <property name="text">
-               <string>Controller</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Expanding</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="CBACTIVE">
-              <property name="text">
-               <string>ACTIVE</string>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QListWidget" name="ControllersList">
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 127);</string>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
             </property>
-           </widget>
+           </spacer>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <layout class="QHBoxLayout" name="horizontalLayout_13">
             <item>
-             <widget class="QCheckBox" name="CBMUX">
-              <property name="text">
-               <string>MUX MODE</string>
-              </property>
-             </widget>
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <item>
+               <widget class="QCheckBox" name="PRL">
+                <property name="text">
+                 <string>POWER BL</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="BRL">
+                <property name="text">
+                 <string>BREAK BL</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="MRL">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>MAX</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QCheckBox" name="CBIGNORE">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>IGN.PLANNER</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-              <property name="autoRepeat">
-               <bool>false</bool>
-              </property>
-              <property name="tristate">
-               <bool>false</bool>
-              </property>
-             </widget>
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <item>
+               <widget class="QCheckBox" name="PRR">
+                <property name="text">
+                 <string>POWER BR</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="BRR">
+                <property name="text">
+                 <string>BREAK BR</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="MRR">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>MAX</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>
@@ -370,410 +407,162 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
       </layout>
      </item>
      <item>
-      <widget class="QGroupBox" name="PPOWER">
+      <widget class="QGroupBox" name="PIN">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="title">
-        <string>POWER</string>
+        <string> INPUT</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_8">
+       <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <item>
-             <widget class="QCheckBox" name="PFL">
-              <property name="text">
-               <string>POWER FL</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="BFL">
-              <property name="text">
-               <string>BREAK FL</string>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="MFL">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>MAX</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QLabel" name="label_16">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Sensitivity</string>
+            </property>
+           </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout">
-              <item>
-               <spacer name="horizontalSpacer_5">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_7">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>MOTORS CURRENTS</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_10">
-              <item>
-               <widget class="QLabel" name="label_3">
-                <property name="text">
-                 <string>NOMINAL</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QSpinBox" name="spinBox_2">
-                <property name="minimum">
-                 <number>0</number>
-                </property>
-                <property name="maximum">
-                 <number>205000</number>
-                </property>
-                <property name="singleStep">
-                 <number>1000</number>
-                </property>
-                <property name="value">
-                 <number>27000</number>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QScrollBar" name="CurSpin">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximum">
-               <number>50000</number>
-              </property>
-              <property name="singleStep">
-               <number>500</number>
-              </property>
-              <property name="pageStep">
-               <number>7000</number>
-              </property>
-              <property name="value">
-               <number>27000</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Expanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
-             <widget class="QCheckBox" name="PFR">
-              <property name="text">
-               <string>POWER FR</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="BFR">
-              <property name="text">
-               <string>BREAK FR</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="MFR">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>MAX</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QSpinBox" name="spinBox">
+            <property name="minimum">
+             <number>-5</number>
+            </property>
+            <property name="maximum">
+             <number>5</number>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
         <item>
-         <spacer name="verticalSpacer_3">
+         <widget class="QScrollBar" name="ISENSITIVITY">
+          <property name="minimum">
+           <number>-5</number>
+          </property>
+          <property name="maximum">
+           <number>5</number>
+          </property>
+          <property name="pageStep">
+           <number>1</number>
+          </property>
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
+         </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_13">
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
-             <spacer name="verticalSpacer_6">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="PRL">
-              <property name="text">
-               <string>POWER BL</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="BRL">
-              <property name="text">
-               <string>BREAK BL</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="MRL">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>MAX</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>Controller</string>
+            </property>
+           </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_12">
-              <item>
-               <widget class="QLabel" name="label_6">
-                <property name="text">
-                 <string>MAX</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QSpinBox" name="spinBox_4">
-                <property name="minimum">
-                 <number>0</number>
-                </property>
-                <property name="maximum">
-                 <number>205000</number>
-                </property>
-                <property name="singleStep">
-                 <number>1000</number>
-                </property>
-                <property name="value">
-                 <number>30000</number>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QScrollBar" name="CurSpin_2">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximum">
-               <number>50000</number>
-              </property>
-              <property name="singleStep">
-               <number>500</number>
-              </property>
-              <property name="pageStep">
-               <number>7000</number>
-              </property>
-              <property name="value">
-               <number>30000</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Expanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_7">
-            <item>
-             <spacer name="verticalSpacer_7">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="PRR">
-              <property name="text">
-               <string>POWER BR</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="BRR">
-              <property name="text">
-               <string>BREAK BR</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="MRR">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>MAX</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QCheckBox" name="CBACTIVE">
+            <property name="text">
+             <string>ACTIVE</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QListWidget" name="ControllersList">
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgb(255, 255, 127);</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QCheckBox" name="CBMUX">
+            <property name="text">
+             <string>MUX MODE</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="CBIGNORE">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>IGN.PLANNER</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+            <property name="autoRepeat">
+             <bool>false</bool>
+            </property>
+            <property name="tristate">
+             <bool>false</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -794,6 +583,12 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
          <layout class="QHBoxLayout" name="horizontalLayout_14">
           <item>
            <widget class="QLabel" name="label_2">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
             <property name="text">
              <string>FORWARD</string>
             </property>
@@ -806,6 +601,12 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
             </property>
             <property name="maximum">
              <number>44</number>
@@ -821,6 +622,12 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
          <layout class="QHBoxLayout" name="horizontalLayout_15">
           <item>
            <widget class="QProgressBar" name="PBDL">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
             <property name="maximum">
              <number>44</number>
             </property>
@@ -831,6 +638,12 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
           </item>
           <item>
            <widget class="QLabel" name="label_11">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
             <property name="text">
              <string>DIFFIRENTIAL</string>
             </property>
@@ -838,6 +651,12 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
           </item>
           <item>
            <widget class="QProgressBar" name="PBDR">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
             <property name="maximum">
              <number>44</number>
             </property>
@@ -879,12 +698,12 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>205</x>
-     <y>230</y>
+     <x>280</x>
+     <y>127</y>
     </hint>
     <hint type="destinationlabel">
-     <x>205</x>
-     <y>250</y>
+     <x>229</x>
+     <y>155</y>
     </hint>
    </hints>
   </connection>
@@ -895,76 +714,12 @@ QDoubleSpinBox::down-arrow:pressed, QSpinBox::down-arrow:pressed {
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>173</x>
-     <y>250</y>
+     <x>197</x>
+     <y>155</y>
     </hint>
     <hint type="destinationlabel">
-     <x>190</x>
-     <y>230</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_2</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>CurSpin</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>550</x>
-     <y>370</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>552</x>
-     <y>390</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>CurSpin</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_2</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>523</x>
-     <y>390</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>530</x>
-     <y>370</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_4</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>CurSpin_2</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>525</x>
-     <y>430</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>502</x>
-     <y>450</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>CurSpin_2</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_4</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>574</x>
-     <y>450</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>552</x>
-     <y>430</y>
+     <x>280</x>
+     <y>127</y>
     </hint>
    </hints>
   </connection>
