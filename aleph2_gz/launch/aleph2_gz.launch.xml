@@ -4,7 +4,7 @@
 
   <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
     <arg name="gz_args" value="
-      -r empty.sdf"
+      -v -r $(var world)"
     />
   </include>
 
