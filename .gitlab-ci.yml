@@ -7,6 +7,7 @@ aleph2_desktop build:
   before_script:
   - apt update
   - rosdep update
+  - git clone https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/aleph2_common
   script:
   - rosdep install --from-paths . --ignore-src -y
   - colcon build
