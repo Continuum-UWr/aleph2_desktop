@@ -4,10 +4,13 @@ stages:
 
 aleph2_desktop build:
   stage: build
+  variables:
+    GZ_VERSION: fortress
   before_script:
   - apt update
   - rosdep update
   - git clone https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/aleph2_common
+  - git clone https://github.com/gazebosim/ros_gz --recurse-submodules
   script:
   - rosdep install --from-paths . --ignore-src -y
   - colcon build
