@@ -4,8 +4,6 @@ stages:
 
 aleph2_desktop build:
   stage: build
-  variables:
-    GZ_VERSION: fortress
   before_script:
   - apt update
   - rosdep update
