@@ -14,7 +14,7 @@ from qtpy.uic import loadUi
 from qtpy.QtWidgets import QWidget
 from qtpy.QtCore import Slot, Signal
 
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import TwistStamped
 from std_msgs.msg import Bool, Float32
 from nav_msgs.msg import Odometry
 
@@ -84,8 +84,8 @@ class Aleph2DrivetrainController(Plugin):
         self.driver_online = threading.Event()
 
         self.pub_ign_planner = self._node.create_publisher(Bool, "ign_planner", 1)
-        self.pub_cmd_vel = self._node.create_publisher(Twist, "aleph2/cmd_vel", 1)
-        self.pub_joy_vel = self._node.create_publisher(Twist, "joy_vel", 1)
+        self.pub_cmd_vel = self._node.create_publisher(TwistStamped, "diff_drive_controller/cmd_vel", 1)
+        self.pub_joy_vel = self._node.create_publisher(TwistStamped, "joy_vel", 1)
 
         self.sub_odom = self._node.create_subscription(
             Odometry,
@@ -302,10 +302,11 @@ class Aleph2DrivetrainController(Plugin):
             )
 
     def publish_command(self, linear, angular):
-        cmd_vel = Twist()
+        cmd_vel = TwistStamped()
 
-        cmd_vel.linear.x = linear
-        cmd_vel.angular.z = angular
+        cmd_vel.header.stamp = self._node.get_clock().now().to_msg()
+        cmd_vel.twist.linear.x = linear
+        cmd_vel.twist.angular.z = angular
 
         if self.mux_mode:
             self.pub_joy_vel.publish(cmd_vel)
