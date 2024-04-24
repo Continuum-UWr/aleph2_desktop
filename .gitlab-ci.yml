@@ -1,0 +1,13 @@
+stages:
+  - build
+
+nix_build:
+  tags: ["nix"]
+  stage: build
+  script:
+  - nix build .#aleph2-gui .#aleph2-viz --verbose
+nix_fmt:
+  tags: ["nix"]
+  stage: build
+  script:
+  - nix fmt -- -c .
