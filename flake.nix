@@ -20,21 +20,21 @@
 
         aleph2-description =
           aleph2-common.packages.${system}.aleph2-description;
-        # input-manager = aleph2-common.packages.${system}.input-manager;
+        input-manager = aleph2-common.packages.${system}.input-manager;
 
-        # aleph2-gui =
-          # ros.callPackage (import ./aleph2_gui) { inherit input-manager; };
+        aleph2-gui =
+          ros.callPackage (import ./aleph2_gui) { inherit input-manager; };
         aleph2-viz =
           ros.callPackage (import ./aleph2_viz) { inherit aleph2-description; };
 
       in {
         packages = {
-          inherit aleph2-viz;
+          inherit aleph2-viz aleph2-gui;
           default = aleph2-viz;
         };
         devShells.default = pkgs.mkShell {
-          inputsFrom = [ aleph2-viz ];
-          packages = [ ros.ros-core aleph2-viz ];
+          inputsFrom = [ aleph2-viz aleph2-gui ];
+          packages = [ ros.ros-core aleph2-viz aleph2-gui ];
         };
         formatter = pkgs.nixfmt;
       });
