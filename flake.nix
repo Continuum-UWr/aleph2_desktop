@@ -25,17 +25,22 @@
 
         aleph2-gui =
           ros.callPackage (import ./aleph2_gui) { inherit input-manager; };
+        aleph2-gz =
+          ros.callPackage (import ./aleph2_gz) { inherit aleph2-description; };
         aleph2-viz =
           ros.callPackage (import ./aleph2_viz) { inherit aleph2-description; };
 
       in {
         packages = {
-          inherit aleph2-viz aleph2-gui;
+          inherit aleph2-gui aleph2-gz aleph2-viz;
           default = aleph2-viz;
         };
         devShells.default = pkgs.mkShell {
-          nativeBuildInputs =
-            [ (ros.buildEnv { paths = [ ros.ros-core aleph2-gui ]; }) ];
+          nativeBuildInputs = [
+            (ros.buildEnv {
+              paths = [ ros.ros-core aleph2-gui aleph2-gz aleph2-viz ];
+            })
+          ];
         };
         formatter = pkgs.nixfmt;
       });
