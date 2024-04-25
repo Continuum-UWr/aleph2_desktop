@@ -2,7 +2,8 @@
   inputs = {
     nixpkgs.follows = "aleph2-common/nixpkgs";
     flake-utils.follows = "aleph2-common/flake-utils";
-    nix-ros-overlay.follows = "aleph2-common/nix-ros-overlay";
+    nix-ros-overlay.url =
+      "git+https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/nix-ros-overlay?ref=gz-vendor";
     aleph2-common.url =
       "git+https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/aleph2_common";
   };
@@ -33,8 +34,8 @@
           default = aleph2-viz;
         };
         devShells.default = pkgs.mkShell {
-          inputsFrom = [ aleph2-viz aleph2-gui ];
-          packages = [ ros.ros-core aleph2-viz aleph2-gui ];
+          nativeBuildInputs =
+            [ (ros.buildEnv { paths = [ ros.ros-core aleph2-gui ]; }) ];
         };
         formatter = pkgs.nixfmt;
       });
