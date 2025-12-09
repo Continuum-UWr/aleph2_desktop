@@ -15,15 +15,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1752331647,
-        "narHash": "sha256-8L3U+hf2I7wGDfvMGdjkTqpQB07HbUX8jkS0QfkDeOk=",
-        "ref": "refs/heads/rolling",
-        "rev": "f6f1c65bb7775148d1683f71868358f2be3b0e4b",
-        "revCount": 66,
+        "lastModified": 1765317336,
+        "narHash": "sha256-cY1WuKURzC5LCEDMqrSiqjDbK71WSD11/HAftaBMBrk=",
+        "ref": "jazzy",
+        "rev": "6a4f4f0d1850c83e1817c7f8ed8e629ce32647cd",
+        "revCount": 70,
         "type": "git",
         "url": "https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/aleph2_common"
       },
       "original": {
+        "ref": "jazzy",
         "type": "git",
         "url": "https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/aleph2_common"
       }
@@ -33,29 +34,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1705309234,
-        "narHash": "sha256-uNRRNRKmJyCRC/8y1RqBkqWBLM034y4qN7EprSdmgyA=",
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "1ef2e671c3b0c19053962c07dbda38332dcebf26",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
-    "flake-utils_2": {
-      "inputs": {
-        "systems": "systems_2"
-      },
-      "locked": {
-        "lastModified": 1710146030,
-        "narHash": "sha256-SZ5L6eA7HJ/nmkzGG7/ISclqe6oZdOZTNoesiInkXPQ=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "b1d9ab70662946ef0850d488da1c9019f3a9752a",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
         "type": "github"
       },
       "original": {
@@ -70,63 +53,27 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1752331620,
-        "narHash": "sha256-pF5CuxbOpx4bp2VE91K0GBAGzO0CehYmBpzjLbe0cHM=",
-        "ref": "continuum",
-        "rev": "660d780fb9fab3d51cd3f05e0f461ebdd926f3e1",
-        "revCount": 929,
+        "lastModified": 1765317272,
+        "narHash": "sha256-VdGAvs7Uuy2V0AXPYwkU75HfhKHtyfmbVFavLLsBvxE=",
+        "ref": "continuum-update",
+        "rev": "512c04fce1a3e58d04c8dc49c37828f8745a7468",
+        "revCount": 1195,
         "type": "git",
         "url": "https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/nix-ros-overlay"
       },
       "original": {
-        "ref": "continuum",
-        "type": "git",
-        "url": "https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/nix-ros-overlay"
-      }
-    },
-    "nix-ros-overlay_2": {
-      "inputs": {
-        "flake-utils": "flake-utils_2",
-        "nixpkgs": "nixpkgs_2"
-      },
-      "locked": {
-        "lastModified": 1720475945,
-        "narHash": "sha256-7dxdy39VvHtCoJikvB+dAPzU5AyvGQRESDQTSUK6BW8=",
-        "ref": "gz-vendor",
-        "rev": "a4f253dd0f35147464b2598e1ca8be652d11a235",
-        "revCount": 949,
-        "type": "git",
-        "url": "https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/nix-ros-overlay"
-      },
-      "original": {
-        "ref": "gz-vendor",
+        "ref": "continuum-update",
         "type": "git",
         "url": "https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/nix-ros-overlay"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1707268954,
-        "narHash": "sha256-2en1kvde3cJVc3ZnTy8QeD2oKcseLFjYPLKhIGDanQ0=",
+        "lastModified": 1744849697,
+        "narHash": "sha256-S9hqvanPSeRu6R4cw0OhvH1rJ+4/s9xIban9C4ocM/0=",
         "owner": "lopsided98",
         "repo": "nixpkgs",
-        "rev": "f8e2ebd66d097614d51a56a755450d4ae1632df1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "lopsided98",
-        "ref": "nix-ros",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_2": {
-      "locked": {
-        "lastModified": 1720031269,
-        "narHash": "sha256-rwz8NJZV+387rnWpTYcXaRNvzUSnnF9aHONoJIYmiUQ=",
-        "owner": "lopsided98",
-        "repo": "nixpkgs",
-        "rev": "9f4128e00b0ae8ec65918efeba59db998750ead6",
+        "rev": "6318f538166fef9f5118d8d78b9b43a04bb049e4",
         "type": "github"
       },
       "original": {
@@ -143,7 +90,10 @@
           "aleph2-common",
           "flake-utils"
         ],
-        "nix-ros-overlay": "nix-ros-overlay_2",
+        "nix-ros-overlay": [
+          "aleph2-common",
+          "nix-ros-overlay"
+        ],
         "nixpkgs": [
           "aleph2-common",
           "nixpkgs"
@@ -151,21 +101,6 @@
       }
     },
     "systems": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
-      }
-    },
-    "systems_2": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",

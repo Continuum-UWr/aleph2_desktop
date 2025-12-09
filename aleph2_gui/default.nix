@@ -12,8 +12,8 @@ buildRosPackage {
   propagatedBuildInputs = [
     rclpy
     ament-index-python
-    python3Packages.qtpy
-    python3Packages.pyqt5
+    # python3Packages.qtpy
+    # python3Packages.pyqt5
     rqt-gui
     rqt-gui-py
     input-manager

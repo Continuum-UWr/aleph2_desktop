@@ -2,10 +2,9 @@
   inputs = {
     nixpkgs.follows = "aleph2-common/nixpkgs";
     flake-utils.follows = "aleph2-common/flake-utils";
-    nix-ros-overlay.url =
-      "git+https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/nix-ros-overlay?ref=gz-vendor";
+    nix-ros-overlay.follows = "aleph2-common/nix-ros-overlay";
     aleph2-common.url =
-      "git+https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/aleph2_common";
+      "git+https://gitlab.continuum.ii.uni.wroc.pl/continuum/software/aleph2_common?ref=jazzy";
   };
   outputs = { self, nixpkgs, flake-utils, nix-ros-overlay, aleph2-common }:
     flake-utils.lib.eachDefaultSystem (system:
@@ -17,7 +16,7 @@
         ros = (import nixpkgs {
           system = system;
           overlays = [ nix-ros-overlay.overlays.default ];
-        }).pkgs.rosPackages.rolling;
+        }).pkgs.rosPackages.jazzy;
 
         aleph2-description =
           aleph2-common.packages.${system}.aleph2-description;
