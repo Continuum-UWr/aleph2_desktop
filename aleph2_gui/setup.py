@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from glob import glob
 
 package_name = "aleph2_gui"
@@ -6,7 +6,7 @@ package_name = "aleph2_gui"
 setup(
     name=package_name,
     version="0.0.0",
-    packages=[package_name],
+    packages=find_packages(),
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml", "rqt_plugins.xml"]),
